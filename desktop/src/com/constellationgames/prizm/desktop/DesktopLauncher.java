@@ -7,6 +7,8 @@ import com.constellationgames.prizm.Prizm;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+		config.height = 924; // Same aspect ratio as a nexus phone
+		config.width = 576;
 		new LwjglApplication(new Prizm(), config);
 	}
 }
