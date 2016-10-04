@@ -24,8 +24,8 @@ public class GameScreen implements Screen, InputProcessor {
 	
 	// Screen values
 	public static final int MARGIN = 40; // In px, margin between the grid and the borders of the screen
-	public static final int STANDARD_WIDTH = 576; // Used to scale the fonts
-	public static final int STANDARD_HEIGHT = 924;
+//	public static final int STANDARD_WIDTH = 576; // Used to scale the fonts
+//	public static final int STANDARD_HEIGHT = 924;
 	
 	private Level level;
 	private Game game;
@@ -39,6 +39,10 @@ public class GameScreen implements Screen, InputProcessor {
 	private SpriteBatch spriteBatch;
 	private GlyphLayout glyphLayout;
 	private BitmapFont font;
+	
+	private int verticalMargin;
+	private int triangleWidth;
+	private int triangleHeight;
 
 	public GameScreen(Game game, Skin skin, int levelNumber) {
 		this.game = game;
@@ -56,6 +60,8 @@ public class GameScreen implements Screen, InputProcessor {
 		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		shapeRenderer = new ShapeRenderer();
 		spriteBatch = new SpriteBatch();
+		
+		resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()); // Initialize the size values
 		
 		// Create the font
 		font = new BitmapFont(Gdx.files.internal("fonts/yaheiUI.fnt"));
@@ -81,7 +87,8 @@ public class GameScreen implements Screen, InputProcessor {
 		shapeRenderer.setProjectionMatrix(camera.combined);
 		spriteBatch.setProjectionMatrix(camera.combined);
 		
-		level.render(delta, shapeRenderer, spriteBatch, font, glyphLayout);
+		level.render(delta, shapeRenderer, spriteBatch, font, glyphLayout,
+				verticalMargin, triangleWidth, triangleHeight);
 		
 		stage.act();
         stage.draw();
@@ -98,6 +105,11 @@ public class GameScreen implements Screen, InputProcessor {
 	@Override
 	public void resize(int width, int height) {
 		camera.setToOrtho(false, width, height);
+		
+		int boardWidth = width - 2 * MARGIN;
+		triangleWidth = boardWidth / 4;
+		triangleHeight = (int) Math.round(triangleWidth / 2.0 * Math.sqrt(3)); // Formula to find height of equilateral triangle
+		verticalMargin = height - 8 * triangleHeight;
 	}
 
 	@Override
