@@ -19,6 +19,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.constellationgames.prizm.Level;
+import com.constellationgames.prizm.Triangle;
+import com.constellationgames.prizm.utils.TriangleColor;
 
 public class GameScreen implements Screen, InputProcessor {
 	
@@ -43,6 +45,9 @@ public class GameScreen implements Screen, InputProcessor {
 	private int verticalMargin;
 	private int triangleWidth;
 	private int triangleHeight;
+	
+	// Variables for drag-and-dropping triangles
+	private Triangle selectedTriangle = null;
 
 	public GameScreen(Game game, Skin skin, int levelNumber) {
 		this.game = game;
@@ -146,11 +151,54 @@ public class GameScreen implements Screen, InputProcessor {
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		return stage.touchDown(screenX, screenY, pointer, button);
+		// Flip the screenY since for some reason libGdx has a different
+		// coordinate system for inputs and for rendering...
+		screenY = Gdx.graphics.getHeight() - screenY;
+		
+		Triangle[][] triangles = level.getTriangles();
+		
+		for (Triangle[] row : triangles) {
+			for (Triangle t: row) {
+				if (t.getColor() != TriangleColor.BLANK && t.getColor() != TriangleColor.GREY
+						&& t.contains(screenX, screenY, verticalMargin, triangleWidth, triangleHeight)) {
+					selectedTriangle = t;
+					
+					return true;
+				}
+			}
+		}
+		
+		return stage.touchUp(screenX, screenY, pointer, button);
 	}
 
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+		// Flip the screenY since for some reason libGdx has a different
+		// coordinate system for inputs and for rendering...
+		screenY = Gdx.graphics.getHeight() - screenY;
+		
+		if (selectedTriangle != null) {
+			Triangle[][] triangles = level.getTriangles();
+			
+			for (Triangle[] row : triangles) {
+				for (Triangle t: row) {
+					if (t != selectedTriangle && t.getColor() == TriangleColor.BLANK
+							&& t.isOvert() == selectedTriangle.isOvert()
+							&& t.contains(screenX, screenY, verticalMargin, triangleWidth, triangleHeight)) {
+						
+						t.setColor(selectedTriangle.getColor());
+						selectedTriangle.setColor(TriangleColor.BLANK);
+						
+						// TODO CHECK IF COLORS CANCEL
+						
+						return true;
+					}
+				}
+			}
+			
+			selectedTriangle = null;
+		}
+		
 		return stage.touchUp(screenX, screenY, pointer, button);
 	}
 

@@ -25,42 +25,77 @@ public class Triangle {
 	
 	public void render(float delta, ShapeRenderer shapeRenderer, int verticalMargin, int triangleWidth, int triangleHeight) {
 		
-		// Each row needs to be centered:
-		int nbInRow = Math.min(row + 1, 8 - row) * 2 - 1;
-		int horizontalOffset = (int) (triangleWidth * (7 - nbInRow) / 4.0); // There are a max of 7 triangles per row
-		
-		float x1, y1, x2, y2, x3, y3; // Triangle coordinates
-		if (isOvert()) {
-			x1 = horizontalOffset + GameScreen.MARGIN + triangleWidth * column / 2;
-			y1 = verticalMargin + triangleHeight * (row + 1);
-			x2 = x1 + triangleWidth;
-			y2 = y1;
-			x3 = (x1 + x2) / 2;
-			y3 = y1 - triangleHeight;
-		}
-		else {
-			x1 = horizontalOffset + GameScreen.MARGIN + triangleWidth * (column - 1) / 2 + triangleWidth / 2;
-			y1 = verticalMargin + triangleHeight * row;
-			x2 = x1 + triangleWidth;
-			y2 = y1;
-			x3 = (x1 + x2) / 2;
-			y3 = y1 + triangleHeight;
-		}
-		
+		float[][] pos = getPosition(verticalMargin, triangleWidth, triangleHeight);
 		
 		// Render the interior
 		shapeRenderer.begin(ShapeType.Filled);
 		shapeRenderer.setColor(color.getColor());
-		shapeRenderer.triangle(x1, y1, x2, y2, x3, y3);
+		shapeRenderer.triangle(pos[0][0], pos[0][1], pos[1][0], pos[1][1], pos[2][0], pos[2][1]);
 		
 		shapeRenderer.end();
 		
 		// Render the border
 		shapeRenderer.begin(ShapeType.Line);
 		shapeRenderer.setColor(Color.BLACK);
-		shapeRenderer.triangle(x1, y1, x2, y2, x3, y3);
+		shapeRenderer.triangle(pos[0][0], pos[0][1], pos[1][0], pos[1][1], pos[2][0], pos[2][1]);
 		
 		shapeRenderer.end();
+	}
+	
+	public float[][] getPosition(int verticalMargin, int triangleWidth, int triangleHeight) {
+		// Each row needs to be centered:
+		int nbInRow = Math.min(row + 1, 8 - row) * 2 - 1;
+		int horizontalOffset = (int) (triangleWidth * (7 - nbInRow) / 4.0); // There are a max of 7 triangles per row
+	
+		float[][] pos = new float[3][2]; // Triangle coordinates
+		if (isOvert()) {
+			pos[0][0] = horizontalOffset + GameScreen.MARGIN + triangleWidth * column / 2;
+			pos[0][1] = verticalMargin + triangleHeight * (row + 1);
+			pos[1][0] = pos[0][0] + triangleWidth;
+			pos[1][1] = pos[0][1];
+			pos[2][0] = (pos[0][0] + pos[1][0]) / 2;
+			pos[2][1] = pos[0][1] - triangleHeight;
+		}
+		else {
+			pos[0][0] = horizontalOffset + GameScreen.MARGIN + triangleWidth * (column - 1) / 2 + triangleWidth / 2;
+			pos[0][1] = verticalMargin + triangleHeight * row;
+			pos[1][0] = pos[0][0] + triangleWidth;
+			pos[1][1] = pos[0][1];
+			pos[2][0] = (pos[0][0] + pos[1][0]) / 2;
+			pos[2][1] = pos[0][1] + triangleHeight;
+		}
+		
+		return pos;
+	}
+	
+	/**
+	 * Check if the triangle contains a point (x, y)
+	 * @return whether the point lies inside the triangle
+	 */
+	public boolean contains(int x, int y, int verticalMargin, int triangleWidth, int triangleHeight) {
+		float[][] pos = getPosition(verticalMargin, triangleWidth, triangleHeight);
+		
+		// See http://mathworld.wolfram.com/TriangleInterior.html for mathematical explanation
+		float v0_x = pos[0][0];
+		float v0_y = pos[0][1];
+		float v1_x = pos[1][0] - v0_x;
+		float v1_y = pos[1][1] - v0_y;
+		float v2_x = pos[2][0] - v0_x;
+		float v2_y = pos[2][1] - v0_y;
+		
+		float denominator = determinant(v1_x, v1_y, v2_x, v2_y);
+		
+		float a = (determinant(x, y, v2_x, v2_y) - determinant(v0_x, v0_y, v2_x, v2_y)) / denominator;
+		float b = - (determinant(x, y, v1_x, v1_y) - determinant(v0_x, v0_y, v1_x, v1_y)) / denominator;
+		
+		if (a > 0 && b > 0 && a + b < 1)
+			return true;
+		else
+			return false;
+	}
+	
+	private float determinant(float u_x, float u_y, float v_x, float v_y) {
+		return u_x * v_y - u_y * v_x;
 	}
 	
 	public void setColor(TriangleColor color) {

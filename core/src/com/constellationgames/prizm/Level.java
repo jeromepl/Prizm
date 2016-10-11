@@ -53,4 +53,8 @@ public class Level {
 	public int getLevelNumber() {
 		return levelNumber;
 	}
+	
+	public Triangle[][] getTriangles() {
+		return triangles;
+	}
 }
