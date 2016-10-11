@@ -1,5 +1,7 @@
 package com.constellationgames.prizm;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
@@ -30,9 +32,47 @@ public class Level {
 			}
 		}
 		
-		//TODO load level from file
+		loadLevel(levelNumber);
+	}
+	
+	private void loadLevel(int levelNumber) {
 		
-		triangles[0][0].setColor(TriangleColor.BLUE);
+		//TODO there is no error handling here. A small mistake in the .csv file and everything goes boom
+		
+		FileHandle levelFile = Gdx.files.internal("levels/" + levelNumber + ".csv");
+		String content = levelFile.readString();
+		
+		String[] rows = content.split("\\r?\\n"); // Split on end-of-lines
+		String[][] cells = new String[rows.length][];
+		for (int i = 0; i < rows.length; i++) {
+			cells[i] = rows[i].split("[;,]");
+		}
+		
+		// Generate the level based on the cells values
+		TriangleColor[] triangleColors = TriangleColor.values(); // Cache the enum values
+		for (int i = 0; i < triangles.length; i++) {
+			
+			int nbInRow = Math.min(i + 1, 8 - i) * 2 - 1;
+			int horizontalOffset = (7 - nbInRow) / 2;
+			
+			for (int j = 0; j < triangles[i].length; j++) {
+				int color = Integer.parseInt(cells[triangles.length - 1 - i][horizontalOffset + j]); // Use triangles.length - 1 - i since the coordinates are flipped
+				TriangleColor triangleColor = null;
+				
+				// Get the corresponding TriangleColor enum value
+				for (int k = 0; k < triangleColors.length; k++) {
+					if(triangleColors[k].getValue() == color) {
+						triangleColor = triangleColors[k];
+						break;
+					}
+				}
+				
+				if (triangleColor == null)
+					throw new RuntimeException("Invalid triangle color " + color);
+				
+				triangles[i][j].setColor(triangleColor);
+			}
+		}
 	}
 	
 	public void render(float delta, ShapeRenderer shapeRenderer, SpriteBatch spriteBatch, BitmapFont font, GlyphLayout glyphLayout,
