@@ -151,6 +151,8 @@ public class GameScreen implements Screen, InputProcessor {
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+		stage.touchDown(screenX, screenY, pointer, button);
+		
 		// Flip the screenY since for some reason libGdx has a different
 		// coordinate system for inputs and for rendering...
 		screenY = Gdx.graphics.getHeight() - screenY;
@@ -168,11 +170,13 @@ public class GameScreen implements Screen, InputProcessor {
 			}
 		}
 		
-		return stage.touchUp(screenX, screenY, pointer, button);
+		return true;
 	}
 
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+		stage.touchUp(screenX, screenY, pointer, button);
+		
 		// Flip the screenY since for some reason libGdx has a different
 		// coordinate system for inputs and for rendering...
 		screenY = Gdx.graphics.getHeight() - screenY;
@@ -199,7 +203,7 @@ public class GameScreen implements Screen, InputProcessor {
 			selectedTriangle = null;
 		}
 		
-		return stage.touchUp(screenX, screenY, pointer, button);
+		return true;
 	}
 
 	@Override
