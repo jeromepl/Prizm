@@ -184,6 +184,7 @@ public class GameScreen implements Screen, InputProcessor {
 		if (selectedTriangle != null) {
 			Triangle[][] triangles = level.getTriangles();
 			
+			outerloop:
 			for (Triangle[] row : triangles) {
 				for (Triangle t: row) {
 					if (t != selectedTriangle && t.getColor() == TriangleColor.BLANK
@@ -195,7 +196,7 @@ public class GameScreen implements Screen, InputProcessor {
 						
 						// TODO CHECK IF COLORS CANCEL
 						
-						return true;
+						break outerloop;
 					}
 				}
 			}
