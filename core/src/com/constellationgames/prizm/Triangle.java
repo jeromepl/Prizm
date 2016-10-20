@@ -1,5 +1,6 @@
 package com.constellationgames.prizm;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
@@ -25,7 +26,7 @@ public class Triangle {
 	
 	public void render(float delta, ShapeRenderer shapeRenderer, int verticalMargin, int triangleWidth, int triangleHeight) {
 		
-		float[][] pos = getPosition(verticalMargin, triangleWidth, triangleHeight);
+		float[][] pos = getScreenPosition(verticalMargin, triangleWidth, triangleHeight);
 		
 		// Render the interior
 		shapeRenderer.begin(ShapeType.Filled);
@@ -42,23 +43,23 @@ public class Triangle {
 		shapeRenderer.end();
 	}
 	
-	public float[][] getPosition(int verticalMargin, int triangleWidth, int triangleHeight) {	
+	private float[][] getScreenPosition(int verticalMargin, int triangleWidth, int triangleHeight) {	
 		float[][] pos = new float[3][2]; // Triangle coordinates
 		if (isOvert()) {
 			pos[0][0] = GameScreen.MARGIN + triangleWidth * column / 2;
-			pos[0][1] = verticalMargin + triangleHeight * (row + 1);
-			pos[1][0] = pos[0][0] + triangleWidth;
-			pos[1][1] = pos[0][1];
-			pos[2][0] = (pos[0][0] + pos[1][0]) / 2;
-			pos[2][1] = pos[0][1] - triangleHeight;
-		}
-		else {
-			pos[0][0] = GameScreen.MARGIN + triangleWidth * (column - 1) / 2 + triangleWidth / 2;
-			pos[0][1] = verticalMargin + triangleHeight * row;
+			pos[0][1] = Gdx.graphics.getHeight() - (verticalMargin + triangleHeight * (row + 1));
 			pos[1][0] = pos[0][0] + triangleWidth;
 			pos[1][1] = pos[0][1];
 			pos[2][0] = (pos[0][0] + pos[1][0]) / 2;
 			pos[2][1] = pos[0][1] + triangleHeight;
+		}
+		else {
+			pos[0][0] = GameScreen.MARGIN + triangleWidth * (column - 1) / 2 + triangleWidth / 2;
+			pos[0][1] = Gdx.graphics.getHeight() - (verticalMargin + triangleHeight * row);
+			pos[1][0] = pos[0][0] + triangleWidth;
+			pos[1][1] = pos[0][1];
+			pos[2][0] = (pos[0][0] + pos[1][0]) / 2;
+			pos[2][1] = pos[0][1] - triangleHeight;
 		}
 		
 		return pos;
@@ -69,7 +70,7 @@ public class Triangle {
 	 * @return whether the point lies inside the triangle
 	 */
 	public boolean contains(int x, int y, int verticalMargin, int triangleWidth, int triangleHeight) {
-		float[][] pos = getPosition(verticalMargin, triangleWidth, triangleHeight);
+		float[][] pos = getScreenPosition(verticalMargin, triangleWidth, triangleHeight);
 		
 		// See http://mathworld.wolfram.com/TriangleInterior.html for mathematical explanation
 		float v0_x = pos[0][0];

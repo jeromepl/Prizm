@@ -55,10 +55,8 @@ public class Level {
 		for (int i = 0; i < triangles.length; i++) {
 			for (int j = 0; j < triangles[i].length; j++) {
 				
-				String[] cellRow = cells[triangles.length - 1 - i];
-				
-				if (cellRow.length > j && cellRow[j].length() > 0) {
-					int color = Integer.parseInt(cellRow[j]); // Use triangles.length - 1 - i since the coordinates are flipped
+				if (cells[i].length > j && cells[i][j].length() > 0) {
+					int color = Integer.parseInt(cells[i][j]);
 					TriangleColor triangleColor = null;
 					
 					// Get the corresponding TriangleColor enum value
