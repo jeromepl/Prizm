@@ -28,6 +28,11 @@ public class Triangle {
 		
 		float[][] pos = getScreenPosition(verticalMargin, triangleWidth, triangleHeight);
 		
+		// Flip y values since the coordinate system is different in render than in input processing...
+		pos[0][1] = Gdx.graphics.getHeight() - pos[0][1];
+		pos[1][1] = Gdx.graphics.getHeight() - pos[1][1];
+		pos[2][1] = Gdx.graphics.getHeight() - pos[2][1];
+		
 		// Render the interior
 		shapeRenderer.begin(ShapeType.Filled);
 		shapeRenderer.setColor(color.getColor());
@@ -47,19 +52,19 @@ public class Triangle {
 		float[][] pos = new float[3][2]; // Triangle coordinates
 		if (isOvert()) {
 			pos[0][0] = GameScreen.MARGIN + triangleWidth * column / 2;
-			pos[0][1] = Gdx.graphics.getHeight() - (verticalMargin + triangleHeight * (row + 1));
-			pos[1][0] = pos[0][0] + triangleWidth;
-			pos[1][1] = pos[0][1];
-			pos[2][0] = (pos[0][0] + pos[1][0]) / 2;
-			pos[2][1] = pos[0][1] + triangleHeight;
-		}
-		else {
-			pos[0][0] = GameScreen.MARGIN + triangleWidth * (column - 1) / 2 + triangleWidth / 2;
-			pos[0][1] = Gdx.graphics.getHeight() - (verticalMargin + triangleHeight * row);
+			pos[0][1] = verticalMargin + triangleHeight * (row + 1);
 			pos[1][0] = pos[0][0] + triangleWidth;
 			pos[1][1] = pos[0][1];
 			pos[2][0] = (pos[0][0] + pos[1][0]) / 2;
 			pos[2][1] = pos[0][1] - triangleHeight;
+		}
+		else {
+			pos[0][0] = GameScreen.MARGIN + triangleWidth * (column - 1) / 2 + triangleWidth / 2;
+			pos[0][1] = verticalMargin + triangleHeight * row;
+			pos[1][0] = pos[0][0] + triangleWidth;
+			pos[1][1] = pos[0][1];
+			pos[2][0] = (pos[0][0] + pos[1][0]) / 2;
+			pos[2][1] = pos[0][1] + triangleHeight;
 		}
 		
 		return pos;
