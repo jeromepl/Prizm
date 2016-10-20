@@ -9,7 +9,7 @@ public class DesktopLauncher {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.height = 924; // Same aspect ratio as a nexus phone
 		config.width = 576;
-		config.samples = 4; // Turn on anti-aliasing
+		config.samples = 8; // Turn on anti-aliasing
 		new LwjglApplication(new Prizm(), config);
 	}
 }
