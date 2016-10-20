@@ -12,10 +12,13 @@ import com.constellationgames.prizm.utils.TriangleColor;
 
 public class Level {
 	
+	public static final int NB_ROWS = 8;
+	public static final int NB_COLUMNS = NB_ROWS - 1; // The max number of triangles on a row
+	
 	private GameScreen gameScreen;
 	private int levelNumber;
 	
-	private Triangle[][] triangles = new Triangle[8][7];
+	private Triangle[][] triangles = new Triangle[NB_ROWS][NB_COLUMNS];
 	
 	private Color textColor = Color.BLACK;
 
@@ -90,10 +93,10 @@ public class Level {
 	
 	/**
 	 * @param rowIndex 0-indexed
-	 * @return the number of triangles on that row, in the range [1,7]
+	 * @return the number of triangles on that row, in the range [1,NB_COLUMNS]
 	 */
 	public static int getRowSize(int rowIndex) {
-		return Math.min(rowIndex + 1, 8 - rowIndex) * 2 - 1;
+		return Math.min(rowIndex + 1, NB_ROWS - rowIndex) * 2 - 1;
 	}
 	
 	// Free memory when exiting the game
