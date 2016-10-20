@@ -108,6 +108,14 @@ public class Triangle {
 		return color;
 	}
 	
+	public int getRow() {
+		return row;
+	}
+	
+	public int getColumn() {
+		return column;
+	}
+	
 	/**
 	 * Check if the triangle points upwards or downwards
 	 * @return whether the triangle is 'overt' or 'invert'

@@ -186,7 +186,8 @@ public class GameScreen implements Screen, InputProcessor {
 						t.setColor(selectedTriangle.getColor());
 						selectedTriangle.setColor(TriangleColor.BLANK);
 						
-						// TODO CHECK IF COLORS CANCEL
+						// Check if some colors cancel out
+						level.checkCollisions(t);
 						
 						break outerloop;
 					}

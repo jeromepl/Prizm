@@ -1,5 +1,7 @@
 package com.constellationgames.prizm;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
@@ -89,6 +91,36 @@ public class Level {
 					t.render(delta, shapeRenderer, verticalMargin, triangleWidth, triangleHeight);
 			}
 		}
+	}
+	
+	
+	/**
+	 * check for color canceling around a given triangle
+	 * @param t
+	 */
+	public void checkCollisions(Triangle t) {
+		TriangleColor color = t.getColor();
+		ArrayList<Triangle> neighbors = new ArrayList<Triangle>();
+		
+		if (t.isOvert()) // Check triangle below
+			neighbors.add(triangles[t.getRow() + 1][t.getColumn()]);
+		else // Check triangle above
+			neighbors.add(triangles[t.getRow() - 1][t.getColumn()]);
+		
+		
+		// Check the triangles on both sides
+		if (t.getColumn() > 0)
+			neighbors.add(triangles[t.getRow()][t.getColumn() - 1]);
+		if (t.getColumn() < NB_COLUMNS - 1)
+			neighbors.add(triangles[t.getRow()][t.getColumn() + 1]);
+		
+		for (Triangle toCheck: neighbors) {
+			if (toCheck != null && toCheck.getColor().getValue() + color.getValue() == TriangleColor.COMPLEMENTARY.getValue()) {
+				toCheck.setColor(TriangleColor.GREY);
+				t.setColor(TriangleColor.GREY);
+			}
+		}
+		
 	}
 	
 	/**
