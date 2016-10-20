@@ -42,14 +42,10 @@ public class Triangle {
 		shapeRenderer.end();
 	}
 	
-	public float[][] getPosition(int verticalMargin, int triangleWidth, int triangleHeight) {
-		// Each row needs to be centered:
-		int nbInRow = Math.min(row + 1, 8 - row) * 2 - 1;
-		int horizontalOffset = (int) (triangleWidth * (7 - nbInRow) / 4.0); // There are a max of 7 triangles per row
-	
+	public float[][] getPosition(int verticalMargin, int triangleWidth, int triangleHeight) {	
 		float[][] pos = new float[3][2]; // Triangle coordinates
 		if (isOvert()) {
-			pos[0][0] = horizontalOffset + GameScreen.MARGIN + triangleWidth * column / 2;
+			pos[0][0] = GameScreen.MARGIN + triangleWidth * column / 2;
 			pos[0][1] = verticalMargin + triangleHeight * (row + 1);
 			pos[1][0] = pos[0][0] + triangleWidth;
 			pos[1][1] = pos[0][1];
@@ -57,7 +53,7 @@ public class Triangle {
 			pos[2][1] = pos[0][1] - triangleHeight;
 		}
 		else {
-			pos[0][0] = horizontalOffset + GameScreen.MARGIN + triangleWidth * (column - 1) / 2 + triangleWidth / 2;
+			pos[0][0] = GameScreen.MARGIN + triangleWidth * (column - 1) / 2 + triangleWidth / 2;
 			pos[0][1] = verticalMargin + triangleHeight * row;
 			pos[1][0] = pos[0][0] + triangleWidth;
 			pos[1][1] = pos[0][1];
@@ -112,6 +108,6 @@ public class Triangle {
 	 */
 	public boolean isOvert() {
 		// Even columns indices are overts in the upper half of the board
-		return (column % 2 == 0 && row < 4 || column % 2 != 0 && row >= 4);
+		return (row + column) % 2 != 0;
 	}
 }

@@ -161,7 +161,7 @@ public class GameScreen implements Screen, InputProcessor {
 		
 		for (Triangle[] row : triangles) {
 			for (Triangle t: row) {
-				if (t.getColor() != TriangleColor.BLANK && t.getColor() != TriangleColor.GREY
+				if (t != null && t.getColor() != TriangleColor.BLANK && t.getColor() != TriangleColor.GREY
 						&& t.contains(screenX, screenY, verticalMargin, triangleWidth, triangleHeight)) {
 					selectedTriangle = t;
 					
@@ -187,7 +187,7 @@ public class GameScreen implements Screen, InputProcessor {
 			outerloop:
 			for (Triangle[] row : triangles) {
 				for (Triangle t: row) {
-					if (t != selectedTriangle && t.getColor() == TriangleColor.BLANK
+					if (t != null && t != selectedTriangle && t.getColor() == TriangleColor.BLANK
 							&& t.isOvert() == selectedTriangle.isOvert()
 							&& t.contains(screenX, screenY, verticalMargin, triangleWidth, triangleHeight)) {
 						

@@ -15,7 +15,7 @@ public class Level {
 	private GameScreen gameScreen;
 	private int levelNumber;
 	
-	private Triangle[][] triangles = new Triangle[8][];
+	private Triangle[][] triangles = new Triangle[8][7];
 	
 	private Color textColor = Color.BLACK;
 
@@ -25,10 +25,12 @@ public class Level {
 		
 		// Initialize the triangles array to be all blank triangles
 		for (int i = 0; i < triangles.length; i++) {
-			triangles[i] = new Triangle[Math.min(i + 1, 8 - i) * 2 - 1]; // Create the diamond shape
-			
+			int offset = (triangles[i].length - getRowSize(i)) / 2;
 			for (int j = 0; j < triangles[i].length; j++) {
-				triangles[i][j] = new Triangle(i, j, TriangleColor.BLANK);
+				if (j >= offset && j < triangles[i].length - offset)
+					triangles[i][j] = new Triangle(i, j, TriangleColor.BLANK);
+				// Triangles out of the bounds of the row stay null
+				// The fact that the diamond shape is placed in a grid makes calculations much easier
 			}
 		}
 		
@@ -51,26 +53,28 @@ public class Level {
 		// Generate the level based on the cells values
 		TriangleColor[] triangleColors = TriangleColor.values(); // Cache the enum values
 		for (int i = 0; i < triangles.length; i++) {
-			
-			int nbInRow = Math.min(i + 1, 8 - i) * 2 - 1;
-			int horizontalOffset = (7 - nbInRow) / 2;
-			
 			for (int j = 0; j < triangles[i].length; j++) {
-				int color = Integer.parseInt(cells[triangles.length - 1 - i][horizontalOffset + j]); // Use triangles.length - 1 - i since the coordinates are flipped
-				TriangleColor triangleColor = null;
 				
-				// Get the corresponding TriangleColor enum value
-				for (int k = 0; k < triangleColors.length; k++) {
-					if(triangleColors[k].getValue() == color) {
-						triangleColor = triangleColors[k];
-						break;
+				String[] cellRow = cells[triangles.length - 1 - i];
+				
+				if (cellRow.length > j && cellRow[j].length() > 0) {
+					int color = Integer.parseInt(cellRow[j]); // Use triangles.length - 1 - i since the coordinates are flipped
+					TriangleColor triangleColor = null;
+					
+					// Get the corresponding TriangleColor enum value
+					for (int k = 0; k < triangleColors.length; k++) {
+						if(triangleColors[k].getValue() == color) {
+							triangleColor = triangleColors[k];
+							break;
+						}
 					}
+					
+					if (triangleColor == null)
+						throw new RuntimeException("Invalid triangle color " + color);
+					
+					triangles[i][j].setColor(triangleColor);
 				}
 				
-				if (triangleColor == null)
-					throw new RuntimeException("Invalid triangle color " + color);
-				
-				triangles[i][j].setColor(triangleColor);
 			}
 		}
 	}
@@ -80,9 +84,18 @@ public class Level {
 		
 		for (Triangle[] row : triangles) {
 			for (Triangle t : row) {
-				t.render(delta, shapeRenderer, verticalMargin, triangleWidth, triangleHeight);
+				if (t != null)
+					t.render(delta, shapeRenderer, verticalMargin, triangleWidth, triangleHeight);
 			}
 		}
+	}
+	
+	/**
+	 * @param rowIndex 0-indexed
+	 * @return the number of triangles on that row, in the range [1,7]
+	 */
+	public static int getRowSize(int rowIndex) {
+		return Math.min(rowIndex + 1, 8 - rowIndex) * 2 - 1;
 	}
 	
 	// Free memory when exiting the game
