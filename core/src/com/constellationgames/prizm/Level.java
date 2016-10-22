@@ -1,7 +1,6 @@
 package com.constellationgames.prizm;
 
 import java.util.ArrayList;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
@@ -121,6 +120,113 @@ public class Level {
 			}
 		}
 		
+	}
+	
+	/**
+	 * Check for big triangles formed with small grey triangles and remove them.
+	 * 
+	 * The idea here is to check for overt triangles first, by doing a top->bottom sweep,
+	 * and then checking for invert triangles with a bottom->top sweep.
+	 * 
+	 * For the top->bottom, here are the possible locations where big triangles can occur (marked by 'x'):
+	 *   0 1 2 3 4 5 6
+	 * 0       x
+	 * 1     x o x
+	 * 2   x o x o x
+	 * 3 o o x o x o o
+	 * 4 o o o x o o o
+	 * 5   o o o o o
+	 * 6     o o o
+	 * 7       o
+	 * 
+	 * For the bottom->top, flip this image.
+	 */
+	public void removeGreyTriangles() {
+		ArrayList<Triangle> toRemove = new ArrayList<Triangle>();
+		
+		// Do both the top->bottom and bottom-top sweeps at the same time:
+		for (int i = 0; i < 5; i++) { // Go through the first 5 rows
+			int rowSize = getRowSize(i);
+			int offset = (triangles[i].length - rowSize) / 2;
+			int skip = (i > 2 ? i - 1 : 0); // Additional offset because on row 3, 4 we don't check all spots
+			
+			for (int j = offset + skip; j < rowSize + offset - skip; j += 2) {
+				// Check for smallest triangles first (made of 4 triangles) then move on to bigger ones if the small one exists
+				// Check for grey triangles below and in the bottom diagonals
+				
+				// top->bottom sweep
+				Triangle toCheck = triangles[i][j];
+				if (toCheck.getColor() == TriangleColor.GREY) {
+					ArrayList<Triangle> greyTriangles = getGreyTriangles(toCheck, true);
+					
+					if (greyTriangles.size() > 1) // If there is only 1 triangle returned then it is not a large enough triangle to be removed
+						toRemove.addAll(greyTriangles);
+				}
+				
+				// bottom->top sweep
+				toCheck = triangles[triangles.length - 1 - i][j];
+				if (toCheck.getColor() == TriangleColor.GREY) {
+					ArrayList<Triangle> greyTriangles = getGreyTriangles(toCheck, false);
+					
+					if (greyTriangles.size() > 1) // If there is only 1 triangle returned then it is not a large enough triangle to be removed
+						toRemove.addAll(greyTriangles);
+				}
+				
+			}
+		}
+		
+		// Make sure to remove triangles only at the very end since all possible grey triangles need to be removed at once
+		for (Triangle t: toRemove) {
+			System.out.println("Remove: " + t.getRow() + ", " + t.getColumn());
+			t.setColor(TriangleColor.BLANK);
+		}
+	}
+	
+	/**
+	 * Check if the 3 triangles below or above the given triangle are grey, recursively.
+	 * This process finds the biggest possible grey triangle.
+	 * Note that some triangles will be checked twice using this method, but it does not really matter as
+	 * they will all be removed in the end.
+	 * @param t the starting triangle
+	 * @param downwards Whether to sweep upwards or downwards
+	 * @return All small grey triangles that are part of bigger triangles (includes duplicates)
+	 */
+	private ArrayList<Triangle> getGreyTriangles(Triangle t, boolean downwards) {
+		Triangle t1 = null, t2 = null, t3 = null;
+		
+		ArrayList<Triangle> greyTriangles = new ArrayList<Triangle>();
+		greyTriangles.add(t);
+		
+		if (downwards) { // Check the bottom 3 triangles
+			int rowSize = getRowSize(t.getRow() + 1);
+			int offset = (NB_COLUMNS - rowSize) / 2;
+			if (t.getRow() < NB_ROWS - 1 && t.getColumn() > offset && t.getColumn() < NB_COLUMNS - 1 - offset) {
+				t1 = triangles[t.getRow() + 1][t.getColumn() - 1];
+				t2 = triangles[t.getRow() + 1][t.getColumn()];
+				t3 = triangles[t.getRow() + 1][t.getColumn() + 1];
+			}
+		}
+		else {
+			int rowSize = getRowSize(t.getRow() - 1);
+			int offset = (NB_COLUMNS - rowSize) / 2;
+			if (t.getRow() > 0 && t.getColumn() > offset && t.getColumn() < NB_COLUMNS - 1 - offset) {
+				t1 = triangles[t.getRow() - 1][t.getColumn() - 1];
+				t2 = triangles[t.getRow() - 1][t.getColumn()];
+				t3 = triangles[t.getRow() - 1][t.getColumn() + 1];
+			}
+		}
+		
+		if (t1 != null && t2 != null && t3 != null
+				&& t1.getColor() == TriangleColor.GREY && t2.getColor() == TriangleColor.GREY && t3.getColor() == TriangleColor.GREY) {
+			
+			greyTriangles.addAll(getGreyTriangles(t1, downwards));
+			// The middle triangle does not need to be checked since the side ones will already take care of the full next layer
+			// Also, the middle triangle will have a different orientation than the other triangles, which helps to get some intuition about this
+			greyTriangles.add(t2);
+			greyTriangles.addAll(getGreyTriangles(t3, downwards));
+		}
+		
+		return greyTriangles;
 	}
 	
 	/**

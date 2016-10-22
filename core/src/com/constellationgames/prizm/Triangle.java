@@ -28,7 +28,7 @@ public class Triangle {
 		
 		float[][] pos = getScreenPosition(verticalMargin, triangleWidth, triangleHeight);
 		
-		// Flip y values since the coordinate system is different in render than in input processing...
+		// Flip y values since libGDX's coordinate system is different in render than in input processing...
 		pos[0][1] = Gdx.graphics.getHeight() - pos[0][1];
 		pos[1][1] = Gdx.graphics.getHeight() - pos[1][1];
 		pos[2][1] = Gdx.graphics.getHeight() - pos[2][1];

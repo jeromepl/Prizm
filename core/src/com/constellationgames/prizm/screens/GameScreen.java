@@ -189,6 +189,9 @@ public class GameScreen implements Screen, InputProcessor {
 						// Check if some colors cancel out
 						level.checkCollisions(t);
 						
+						// After all collisions have been checked, remove Grey triangles
+						level.removeGreyTriangles();
+						
 						break outerloop;
 					}
 				}
