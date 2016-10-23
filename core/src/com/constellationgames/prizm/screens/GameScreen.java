@@ -179,20 +179,41 @@ public class GameScreen implements Screen, InputProcessor {
 			outerloop:
 			for (Triangle[] row : triangles) {
 				for (Triangle t: row) {
-					if (t != null && t != selectedTriangle && t.getColor() == TriangleColor.BLANK
-							&& t.isOvert() == selectedTriangle.isOvert()
+					if (t != null && t != selectedTriangle && t.isOvert() == selectedTriangle.isOvert()
 							&& t.contains(screenX, screenY, verticalMargin, triangleWidth, triangleHeight)) {
 						
-						t.setColor(selectedTriangle.getColor());
-						selectedTriangle.setColor(TriangleColor.BLANK);
+						TriangleColor colorFrom = selectedTriangle.getColor();
+						TriangleColor colorTo = t.getColor();
+						boolean destinationModified = false;
 						
-						// Check if some colors cancel out
-						level.checkCollisions(t);
+						if (colorTo == TriangleColor.BLANK) {
+							t.setColor(colorFrom);
+							selectedTriangle.setColor(TriangleColor.BLANK);
+							
+							destinationModified = true;
+						}
+						else if (colorFrom.getValue() <= TriangleColor.RED.getValue()
+								&& selectedTriangle.getColor().getValue() <= TriangleColor.RED.getValue()
+								&& colorFrom != colorTo) {
+							
+							// If the two colors are primary colors and are not the same, then the colors
+							// combined to form a secondary color
+							t.setColor(TriangleColor.addColors(colorFrom, colorTo));
+							selectedTriangle.setColor(TriangleColor.BLANK);
+							
+							destinationModified = true;
+						}
 						
-						// After all collisions have been checked, remove Grey triangles
-						level.removeGreyTriangles();
+						if (destinationModified) {
+							// Check if some colors cancel out
+							level.checkCollisions(t);
+							
+							// After all collisions have been checked, remove Grey triangles
+							level.removeGreyTriangles();
+							
+							break outerloop;
+						}
 						
-						break outerloop;
 					}
 				}
 			}

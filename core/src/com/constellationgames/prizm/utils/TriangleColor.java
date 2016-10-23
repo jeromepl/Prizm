@@ -35,4 +35,22 @@ public enum TriangleColor {
 	public Color getColor() {
 		return color;
 	}
+	
+	/**
+	 * Adds two primary colors and returns the resulting secondary color.
+	 * Returns null in the case that no color could be formed from the given 2.
+	 * @param color1
+	 * @param color2
+	 * @return
+	 */
+	public static TriangleColor addColors(TriangleColor color1, TriangleColor color2) {
+		TriangleColor[] colors = TriangleColor.values();
+		int sum = color1.getValue() + color2.getValue();
+		
+		for (TriangleColor c : colors) {
+			if (sum == c.getValue())
+				return c;
+		}
+		return null;
+	}
 }
