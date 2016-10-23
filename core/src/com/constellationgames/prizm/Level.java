@@ -177,8 +177,9 @@ public class Level {
 		
 		// Make sure to remove triangles only at the very end since all possible grey triangles need to be removed at once
 		for (Triangle t: toRemove) {
-			System.out.println("Remove: " + t.getRow() + ", " + t.getColumn());
 			t.setColor(TriangleColor.BLANK);
+			
+			// TODO create a point system. Check if t.getColor != TriangleColor.BLANK already and if so add points
 		}
 	}
 	
