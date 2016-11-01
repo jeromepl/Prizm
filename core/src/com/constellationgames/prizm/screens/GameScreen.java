@@ -18,6 +18,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Timer;
+import com.badlogic.gdx.utils.Timer.Task;
 import com.constellationgames.prizm.Level;
 import com.constellationgames.prizm.Triangle;
 import com.constellationgames.prizm.utils.TriangleColor;
@@ -34,6 +36,7 @@ public class GameScreen implements Screen, InputProcessor {
 	
 	private Stage stage;
 	private Skin skin;
+	private ColorSelectionPopup popup;
 	private TextButton backButton;
 	
 	private OrthographicCamera camera;
@@ -58,6 +61,7 @@ public class GameScreen implements Screen, InputProcessor {
 		
 		stage = new Stage();
 		backButton = new TextButton("Back", skin);
+		popup = new ColorSelectionPopup(this, skin);
 	}
 	
 	@Override
@@ -82,6 +86,7 @@ public class GameScreen implements Screen, InputProcessor {
 		});
 		
 		stage.addActor(backButton);
+		stage.addActor(popup);
 	}
 	
 	@Override
@@ -95,7 +100,7 @@ public class GameScreen implements Screen, InputProcessor {
 		level.render(delta, shapeRenderer, spriteBatch, font, glyphLayout,
 				verticalMargin, triangleWidth, triangleHeight);
 		
-		stage.act();
+		stage.act(delta);
         stage.draw();
 	}
 	
@@ -153,15 +158,17 @@ public class GameScreen implements Screen, InputProcessor {
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 		stage.touchDown(screenX, screenY, pointer, button);
 		
-		Triangle[][] triangles = level.getTriangles();
-		
-		for (Triangle[] row : triangles) {
-			for (Triangle t: row) {
-				if (t != null && t.getColor() != TriangleColor.BLANK && t.getColor() != TriangleColor.GREY
-						&& t.contains(screenX, screenY, verticalMargin, triangleWidth, triangleHeight)) {
-					selectedTriangle = t;
-					
-					return true;
+		if (!popup.isVisible()) {
+			Triangle[][] triangles = level.getTriangles();
+			
+			for (Triangle[] row : triangles) {
+				for (Triangle t: row) {
+					if (t != null && t.getColor() != TriangleColor.BLANK && t.getColor() != TriangleColor.GREY
+							&& t.contains(screenX, screenY, verticalMargin, triangleWidth, triangleHeight)) {
+						selectedTriangle = t;
+						
+						return true;
+					}
 				}
 			}
 		}
@@ -178,7 +185,7 @@ public class GameScreen implements Screen, InputProcessor {
 			
 			outerloop:
 			for (Triangle[] row : triangles) {
-				for (Triangle t: row) {
+				for (final Triangle t: row) {
 					if (t != null && t != selectedTriangle && t.isOvert() == selectedTriangle.isOvert()
 							&& t.contains(screenX, screenY, verticalMargin, triangleWidth, triangleHeight)) {
 						
@@ -187,13 +194,20 @@ public class GameScreen implements Screen, InputProcessor {
 						boolean destinationModified = false;
 						
 						if (colorTo == TriangleColor.BLANK) {
-							t.setColor(colorFrom);
-							selectedTriangle.setColor(TriangleColor.BLANK);
+							if (colorFrom.getValue() <= TriangleColor.RED.getValue()) {
+								t.setColor(colorFrom);
+								selectedTriangle.setColor(TriangleColor.BLANK);
+								destinationModified = true;
+							}
+							else {
+								// destinationModified is not set to true. The update will happen when the pop-up terminates
+								popup.show(screenX, Gdx.graphics.getHeight() - screenY, selectedTriangle, t, colorFrom);
 							
-							destinationModified = true;
+								break outerloop;
+							}
 						}
 						else if (colorFrom.getValue() <= TriangleColor.RED.getValue()
-								&& selectedTriangle.getColor().getValue() <= TriangleColor.RED.getValue()
+								&& colorTo.getValue() <= TriangleColor.RED.getValue()
 								&& colorFrom != colorTo) {
 							
 							// If the two colors are primary colors and are not the same, then the colors
@@ -203,14 +217,16 @@ public class GameScreen implements Screen, InputProcessor {
 							
 							destinationModified = true;
 						}
+						else if (colorFrom.getValue() > TriangleColor.RED.getValue()
+								&& colorTo.getValue() <= TriangleColor.RED.getValue()) {
+							// destinationModified is not set to true. The update will happen when the pop-up terminates
+							popup.show(screenX, Gdx.graphics.getHeight() - screenY, selectedTriangle, t, colorFrom);
+						
+							break outerloop;
+						}
 						
 						if (destinationModified) {
-							// Check if some colors cancel out
-							level.checkCollisions(t);
-							
-							// After all collisions have been checked, remove Grey triangles
-							level.removeGreyTriangles();
-							
+							updateLevel(t);
 							break outerloop;
 						}
 						
@@ -222,6 +238,25 @@ public class GameScreen implements Screen, InputProcessor {
 		}
 		
 		return true;
+	}
+	
+	public void updateLevel(final Triangle... updatedTriangles) {
+		Timer.schedule(new Task(){
+		    @Override
+		    public void run() {
+		    	// Check if some colors cancel out
+		    	for (Triangle t: updatedTriangles)
+		    		level.checkCollisions(t);
+		    	
+				Timer.schedule(new Task(){
+				    @Override
+				    public void run() {
+				    	// After all collisions have been checked, remove Grey triangles
+						level.removeGreyTriangles();
+				    }
+				}, 0.5f);
+		    }
+		}, 0.5f);
 	}
 
 	@Override
