@@ -16,9 +16,13 @@ public class ColorSelectionPopup extends Table {
 	private Label header;
 	private Triangle fromTriangle, toTriangle;
 	private TriangleColor color1, color2;
+	
+	private GameScreen gameScreen;
 
 	public ColorSelectionPopup(final GameScreen gameScreen, Skin skin) {
 		super();
+		
+		this.gameScreen = gameScreen;
 		
 		float fontScale = 0.2f;
 		header = new Label("Split Color", skin);
@@ -33,20 +37,14 @@ public class ColorSelectionPopup extends Table {
 		color1Button.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				fromTriangle.setColor(color2);
-				toTriangle.setColor(TriangleColor.addColors(toTriangle.getColor(), color1));
-				setVisible(false);
-				gameScreen.updateLevel(fromTriangle, toTriangle);
+				splitColor(true);
 			}
 		});
 		
 		color2Button.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				fromTriangle.setColor(color1);
-				toTriangle.setColor(TriangleColor.addColors(toTriangle.getColor(), color2));
-				setVisible(false);
-				gameScreen.updateLevel(fromTriangle, toTriangle);
+				splitColor(false);
 			}
 		});
 		
@@ -55,13 +53,17 @@ public class ColorSelectionPopup extends Table {
 		add(color1Button).pad(0, 0, 0, 5);
 		add(color2Button).pad(0, 5, 0, 0);
 		
-//		Pixmap pm = new Pixmap(1, 1, Format.RGB565);
-//		pm.setColor(Color.WHITE);
-//		pm.fill();
-//		Drawable background = new TextureRegionDrawable(new TextureRegion(new Texture(pm)));
-//		setBackground(background);
-		
 		setVisible(false);
+	}
+	
+	private void splitColor(boolean pickedColor1) {
+		TriangleColor fromColor = pickedColor1 ? color2 : color1;
+		TriangleColor toColor = pickedColor1 ? color1 : color2;
+		
+		fromTriangle.setColor(fromColor);
+		toTriangle.setColor(TriangleColor.addColors(toTriangle.getColor(), toColor));
+		setVisible(false);
+		gameScreen.updateLevel(fromTriangle, toTriangle);
 	}
 	
 	public void show(float x, float y, Triangle fromTriangle, Triangle toTriangle, TriangleColor unsplitColor) {
@@ -82,6 +84,12 @@ public class ColorSelectionPopup extends Table {
 			break;
 		default:
 			throw new RuntimeException("Color " + unsplitColor.name() + " is not a secondary color, it cannot be split");
+		}
+		
+		// In the case that one of the primary colors is already the destination triangle, pick the other
+		if (toTriangle.getColor() == color1 || toTriangle.getColor() == color2) {
+			splitColor(toTriangle.getColor() == color2);
+			return;
 		}
 		
 		color1Button.setText(color1.name());
