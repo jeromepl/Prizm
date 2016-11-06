@@ -11,6 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.constellationgames.prizm.utils.CustomTextButton;
 
 public class MenuScreen implements Screen {
 	
@@ -23,14 +25,14 @@ public class MenuScreen implements Screen {
 	private static final float STANDARD_TITLE_SCALE = 0.5f;
 	private static final float STANDARD_BUTTON_SCALE = 0.13f;
 	
-	private Stage stage = new Stage();
+	private Stage stage = new Stage(new ScreenViewport());
 	private Table table = new Table();
 	
 	private Game game;
 	
 	private Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
-	private TextButton play = new TextButton("Play", skin);
-	private TextButton about = new TextButton("About", skin);
+	private TextButton play = new CustomTextButton("Play", skin);
+	private TextButton about = new CustomTextButton("About", skin);
 	private Label title = new Label("PRIZM", skin);
 	
 	public MenuScreen(Game game) {
@@ -87,6 +89,7 @@ public class MenuScreen implements Screen {
 
 	@Override
 	public void resize(int width, int height) {
+		stage.getViewport().update(width, height, true);
 	}
 
 	@Override
