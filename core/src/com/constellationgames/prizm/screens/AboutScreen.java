@@ -7,44 +7,46 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.constellationgames.prizm.Prizm;
+import com.constellationgames.prizm.utils.CustomTextButton;
 
 public class AboutScreen implements Screen {
 	
-	private static final int STANDARD_WIDTH = 576; // Used to scale everything
 	private static final float STANDARD_BUTTON_SCALE = 0.13f;
+	private static final int STANDARD_BUTTON_WIDTH = 350;
+	private static final int STANDARD_BUTTON_HEIGHT = 70;
 	
-	private Game game;
 	private Skin skin;
-	private Stage stage = new Stage();
+	private Stage stage = new Stage(new ExtendViewport(Prizm.STANDARD_WIDTH, Prizm.STANDARD_HEIGHT));
+	private Table table = new Table();
 	
 	private TextButton backButton;
 	
-	public AboutScreen(Game game, Skin skin) {
-		this.game = game;
+	public AboutScreen(final Game game, final Skin skin) {
 		this.skin = skin;
 		
-		backButton = new TextButton("Back", skin);
-	}
-
-	@Override
-	public void show() {
-		float xScale = Gdx.graphics.getWidth() * 1.0f / STANDARD_WIDTH;
-		
-		backButton.getStyle().font.getData().setScale(STANDARD_BUTTON_SCALE * xScale);
-		
-		stage.addActor(backButton);
-		
-		Gdx.input.setInputProcessor(stage);
-		
+		backButton = new CustomTextButton("Back", skin);
 		backButton.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				game.setScreen(new MenuScreen(game));
 			}
 		});
+	}
+
+	@Override
+	public void show() {
+		backButton.setSize(STANDARD_BUTTON_WIDTH, STANDARD_BUTTON_HEIGHT);
+		backButton.getStyle().font.getData().setScale(STANDARD_BUTTON_SCALE);
 		
+		stage.addActor(backButton);
+		
+		Gdx.input.setInputProcessor(stage);
 	}
 
 	@Override
@@ -58,8 +60,7 @@ public class AboutScreen implements Screen {
 
 	@Override
 	public void resize(int width, int height) {
-		// TODO Auto-generated method stub
-		
+		stage.getViewport().update(width, height, true);
 	}
 
 	@Override

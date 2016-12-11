@@ -81,13 +81,12 @@ public class Level {
 		}
 	}
 	
-	public void render(float delta, ShapeRenderer shapeRenderer, SpriteBatch spriteBatch, BitmapFont font, GlyphLayout glyphLayout,
-			int verticalMargin, int triangleWidth, int triangleHeight) {
+	public void render(float delta, ShapeRenderer shapeRenderer, SpriteBatch spriteBatch, BitmapFont font, GlyphLayout glyphLayout) {
 		
 		for (Triangle[] row : triangles) {
 			for (Triangle t : row) {
 				if (t != null)
-					t.render(delta, shapeRenderer, verticalMargin, triangleWidth, triangleHeight);
+					t.render(delta, shapeRenderer);
 			}
 		}
 	}

@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -13,6 +14,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -20,16 +22,17 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.constellationgames.prizm.Level;
+import com.constellationgames.prizm.Prizm;
 import com.constellationgames.prizm.Triangle;
 import com.constellationgames.prizm.utils.TriangleColor;
 
 public class GameScreen implements Screen, InputProcessor {
 	
 	// Screen values
-	public static final int MARGIN = 40; // In px, margin between the grid and the borders of the screen
-//	public static final int STANDARD_WIDTH = 576; // Used to scale the fonts
-//	public static final int STANDARD_HEIGHT = 924;
+	public static final int MARGIN = 30; // In px, margin between the grid and the borders of the screen
 	
 	private Level level;
 	private Game game;
@@ -39,15 +42,11 @@ public class GameScreen implements Screen, InputProcessor {
 	private ColorSelectionPopup popup;
 	private TextButton backButton;
 	
-	private OrthographicCamera camera;
+	private Viewport viewport;
 	private ShapeRenderer shapeRenderer;
 	private SpriteBatch spriteBatch;
 	private GlyphLayout glyphLayout;
 	private BitmapFont font;
-	
-	private int verticalMargin;
-	private int triangleWidth;
-	private int triangleHeight;
 	
 	// Variables for drag-and-dropping triangles
 	private Triangle selectedTriangle = null;
@@ -58,19 +57,21 @@ public class GameScreen implements Screen, InputProcessor {
 		level = new Level(this, levelNumber);
 		
 		Gdx.input.setInputProcessor(this);
-		
-		stage = new Stage();
-		backButton = new TextButton("Back", skin);
-		popup = new ColorSelectionPopup(this, skin);
 	}
 	
 	@Override
 	public void show() {
-		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		Camera camera = new OrthographicCamera(Prizm.STANDARD_WIDTH, Prizm.STANDARD_HEIGHT);
+		viewport = new ExtendViewport(Prizm.STANDARD_WIDTH, Prizm.STANDARD_HEIGHT, camera);
+		
+		resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		
 		shapeRenderer = new ShapeRenderer();
 		spriteBatch = new SpriteBatch();
 		
-		resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()); // Initialize the size values
+		stage = new Stage(viewport);
+		backButton = new TextButton("Back", skin);
+		popup = new ColorSelectionPopup(this, skin);
 		
 		// Create the font
 		font = new BitmapFont(Gdx.files.internal("fonts/yaheiUI.fnt"));
@@ -81,7 +82,7 @@ public class GameScreen implements Screen, InputProcessor {
 		backButton.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				game.setScreen(new MenuScreen(game));
+				game.setScreen(new LevelSelectScreen(game, skin));
 			}
 		});
 		
@@ -94,11 +95,10 @@ public class GameScreen implements Screen, InputProcessor {
 		Gdx.gl.glClearColor(0.85f, 0.85f, 0.85f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
-		shapeRenderer.setProjectionMatrix(camera.combined);
-		spriteBatch.setProjectionMatrix(camera.combined);
+		shapeRenderer.setProjectionMatrix(viewport.getCamera().combined);
+		spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
 		
-		level.render(delta, shapeRenderer, spriteBatch, font, glyphLayout,
-				verticalMargin, triangleWidth, triangleHeight);
+		level.render(delta, shapeRenderer, spriteBatch, font, glyphLayout);
 		
 		stage.act(delta);
         stage.draw();
@@ -114,12 +114,11 @@ public class GameScreen implements Screen, InputProcessor {
 	
 	@Override
 	public void resize(int width, int height) {
-		camera.setToOrtho(false, width, height);
+		viewport.update(width, height, false);
 		
-		int boardWidth = width - 2 * MARGIN;
-		triangleWidth = boardWidth / 4;
-		triangleHeight = (int) Math.round(triangleWidth / 2.0 * Math.sqrt(3)); // Formula to find height of equilateral triangle
-		verticalMargin = height - 8 * triangleHeight;
+		// Work around bug in ExtendViewport. Centers the camera.
+		// See http://badlogicgames.com/forum/viewtopic.php?f=11&t=14331
+		viewport.getCamera().position.set(Prizm.STANDARD_WIDTH / 2, Prizm.STANDARD_HEIGHT / 2, 0);
 	}
 
 	@Override
@@ -158,13 +157,18 @@ public class GameScreen implements Screen, InputProcessor {
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 		stage.touchDown(screenX, screenY, pointer, button);
 		
+		Vector3 coords = viewport.getCamera().unproject(new Vector3(screenX, Gdx.graphics.getHeight() - screenY, 0),
+				viewport.getScreenX(), viewport.getScreenY(), viewport.getScreenWidth(), viewport.getScreenHeight());
+		screenX = (int)coords.x;
+		screenY = (int)coords.y;
+		//System.out.println(screenX + " : " + screenY);
+		
 		if (!popup.isVisible()) {
 			Triangle[][] triangles = level.getTriangles();
 			
 			for (Triangle[] row : triangles) {
 				for (Triangle t: row) {
-					if (t != null && t.getColor() != TriangleColor.BLANK && t.getColor() != TriangleColor.GREY
-							&& t.contains(screenX, screenY, verticalMargin, triangleWidth, triangleHeight)) {
+					if (t != null && t.getColor() != TriangleColor.BLANK && t.getColor() != TriangleColor.GREY && t.contains(screenX, screenY)) {
 						selectedTriangle = t;
 						
 						return true;
@@ -180,14 +184,18 @@ public class GameScreen implements Screen, InputProcessor {
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
 		stage.touchUp(screenX, screenY, pointer, button);
 		
+		Vector3 coords = viewport.getCamera().unproject(new Vector3(screenX, Gdx.graphics.getHeight() - screenY, 0),
+				viewport.getScreenX(), viewport.getScreenY(), viewport.getScreenWidth(), viewport.getScreenHeight());
+		screenX = (int)coords.x;
+		screenY = (int)coords.y;
+		
 		if (selectedTriangle != null) {
 			Triangle[][] triangles = level.getTriangles();
 			
 			outerloop:
 			for (Triangle[] row : triangles) {
 				for (final Triangle t: row) {
-					if (t != null && t != selectedTriangle && t.isOvert() == selectedTriangle.isOvert()
-							&& t.contains(screenX, screenY, verticalMargin, triangleWidth, triangleHeight)) {
+					if (t != null && t != selectedTriangle && t.isOvert() == selectedTriangle.isOvert() && t.contains(screenX, screenY)) {
 						
 						TriangleColor colorFrom = selectedTriangle.getColor();
 						TriangleColor colorTo = t.getColor();
@@ -201,7 +209,7 @@ public class GameScreen implements Screen, InputProcessor {
 							}
 							else {
 								// destinationModified is not set to true. The update will happen when the pop-up terminates
-								popup.show(screenX, Gdx.graphics.getHeight() - screenY, selectedTriangle, t, colorFrom);
+								popup.show(screenX, Prizm.STANDARD_HEIGHT - screenY, selectedTriangle, t, colorFrom);
 							
 								break outerloop;
 							}
@@ -220,7 +228,7 @@ public class GameScreen implements Screen, InputProcessor {
 						else if (colorFrom.getValue() > TriangleColor.RED.getValue()
 								&& colorTo.getValue() <= TriangleColor.RED.getValue()) {
 							// destinationModified is not set to true. The update will happen when the pop-up terminates
-							popup.show(screenX, Gdx.graphics.getHeight() - screenY, selectedTriangle, t, colorFrom);
+							popup.show(screenX, Prizm.STANDARD_HEIGHT - screenY, selectedTriangle, t, colorFrom);
 						
 							break outerloop;
 						}

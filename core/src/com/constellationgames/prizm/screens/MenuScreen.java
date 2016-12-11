@@ -11,13 +11,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.constellationgames.prizm.Prizm;
 import com.constellationgames.prizm.utils.CustomTextButton;
 
 public class MenuScreen implements Screen {
 	
-	private static final int STANDARD_WIDTH = 576; // Used to scale everything
-	private static final int STANDARD_HEIGHT = 924;
 	private static final int STANDARD_BUTTON_PADDING = 15;
 	private static final int STANDARD_TITLE_PADDING = 80;
 	private static final int STANDARD_BUTTON_WIDTH = 350;
@@ -25,7 +24,7 @@ public class MenuScreen implements Screen {
 	private static final float STANDARD_TITLE_SCALE = 0.5f;
 	private static final float STANDARD_BUTTON_SCALE = 0.13f;
 	
-	private Stage stage = new Stage(new ScreenViewport());
+	private Stage stage = new Stage(new ExtendViewport(Prizm.STANDARD_WIDTH, Prizm.STANDARD_HEIGHT));
 	private Table table = new Table();
 	
 	private Game game;
@@ -43,17 +42,13 @@ public class MenuScreen implements Screen {
 	public void show() {
 		
 		// Set up the menu elements
+		title.setFontScale(STANDARD_TITLE_SCALE);
+		play.getStyle().font.getData().setScale(STANDARD_BUTTON_SCALE);
+		about.getStyle().font.getData().setScale(STANDARD_BUTTON_SCALE);
 		
-		float xScale = Gdx.graphics.getWidth() * 1.0f / STANDARD_WIDTH;
-		float yScale = Gdx.graphics.getHeight() * 1.0f / STANDARD_HEIGHT;
-		
-		title.setFontScale(STANDARD_TITLE_SCALE * xScale);
-		play.getStyle().font.getData().setScale(STANDARD_BUTTON_SCALE * xScale);
-		about.getStyle().font.getData().setScale(STANDARD_BUTTON_SCALE * xScale);
-		
-		table.add(title).pad(STANDARD_TITLE_PADDING * yScale).row();
-		table.add(play).size(STANDARD_BUTTON_WIDTH * xScale, STANDARD_BUTTON_HEIGHT * yScale).pad(STANDARD_BUTTON_PADDING * yScale).row();
-		table.add(about).size(STANDARD_BUTTON_WIDTH * xScale, STANDARD_BUTTON_HEIGHT * yScale).pad(STANDARD_BUTTON_PADDING * yScale).row();
+		table.add(title).pad(STANDARD_TITLE_PADDING).row();
+		table.add(play).size(STANDARD_BUTTON_WIDTH, STANDARD_BUTTON_HEIGHT).pad(STANDARD_BUTTON_PADDING).row();
+		table.add(about).size(STANDARD_BUTTON_WIDTH, STANDARD_BUTTON_HEIGHT).pad(STANDARD_BUTTON_PADDING).row();
 		
 		table.setFillParent(true);
 		stage.addActor(table);

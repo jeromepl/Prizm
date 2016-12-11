@@ -13,20 +13,20 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.constellationgames.prizm.Prizm;
 import com.constellationgames.prizm.utils.CustomTextButton;
 
 public class LevelSelectScreen implements Screen {
-	
-	private static final int STANDARD_WIDTH = 576; // Used to scale everything
-	private static final int STANDARD_HEIGHT = 924;
+
 	private static final float STANDARD_BUTTON_SCALE = 0.13f;
 	private static final int STANDARD_BUTTON_WIDTH = 100;
 	private static final int STANDARD_BUTTON_HEIGHT = 70;
 	private static final int STANDARD_BUTTON_MARGIN = 10;
 	private static final float STANDARD_TITLE_SCALE = 0.4f;
 	
-	private Stage stage = new Stage(new ScreenViewport());
+	private Stage stage = new Stage(new ExtendViewport(Prizm.STANDARD_WIDTH, Prizm.STANDARD_HEIGHT));
 	
 	private TextButton[] levelButtons;
 	private TextButton backButton;
@@ -61,22 +61,19 @@ public class LevelSelectScreen implements Screen {
 	public void show() {
 		Table table = new Table();
 		
-		float xScale = Gdx.graphics.getWidth() * 1.0f / STANDARD_WIDTH;
-		float yScale = Gdx.graphics.getHeight() * 1.0f / STANDARD_HEIGHT;
+		int buttonsPerRow = ((int)(Prizm.STANDARD_WIDTH - 2 * STANDARD_BUTTON_MARGIN)) / (STANDARD_BUTTON_WIDTH + STANDARD_BUTTON_MARGIN);
 		
-		int buttonsPerRow = ((int)(Gdx.graphics.getWidth() - 2 * STANDARD_BUTTON_MARGIN * xScale)) / ((int) (xScale * (STANDARD_BUTTON_WIDTH + STANDARD_BUTTON_MARGIN)));
+		backButton.setSize(STANDARD_BUTTON_WIDTH, STANDARD_BUTTON_HEIGHT * 3f/4); // Changing STANDARD_BUTTON_WIDTH to Gdx.graphics.getHeight() will make the row of levels fill the width of the screen
+		backButton.getStyle().font.getData().setScale(STANDARD_BUTTON_SCALE);
 		
-		backButton.setSize(STANDARD_BUTTON_WIDTH * xScale, STANDARD_BUTTON_HEIGHT * 3f/4 * yScale);
-		backButton.getStyle().font.getData().setScale(STANDARD_BUTTON_SCALE * Math.min(xScale, yScale));
-		
-		screenTitle.setFontScale(STANDARD_TITLE_SCALE * xScale);
+		screenTitle.setFontScale(STANDARD_TITLE_SCALE);
 		table.add(screenTitle).colspan(buttonsPerRow).spaceBottom(4 * STANDARD_BUTTON_MARGIN).center();
 		
 		for (int i = 0; i < levelButtons.length; i++) {
 			if (i % buttonsPerRow == 0)
 				table.row();
 			
-			levelButtons[i].setSize(STANDARD_BUTTON_WIDTH * xScale, STANDARD_BUTTON_HEIGHT * yScale);
+			levelButtons[i].setSize(STANDARD_BUTTON_WIDTH, STANDARD_BUTTON_HEIGHT);
 			table.add(levelButtons[i]).space(STANDARD_BUTTON_MARGIN).size(levelButtons[i].getWidth(), levelButtons[i].getHeight());
 		}
 		table.row();

@@ -6,6 +6,9 @@ import com.constellationgames.prizm.screens.MenuScreen;
 
 public class Prizm extends Game {
 	
+	public static final int STANDARD_WIDTH = 576;
+	public static final int STANDARD_HEIGHT = 924;
+	
 	@Override
 	public void create() {
 		setScreen(new MenuScreen(this));
