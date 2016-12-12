@@ -29,7 +29,7 @@ public class MenuScreen implements Screen {
 	
 	private Game game;
 	
-	private Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
+	private static Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
 	private TextButton play = new CustomTextButton("Play", skin);
 	private TextButton about = new CustomTextButton("About", skin);
 	private Label title = new Label("PRIZM", skin);
@@ -101,6 +101,7 @@ public class MenuScreen implements Screen {
 
 	@Override
 	public void dispose() {
+		skin.dispose();
 	}
 
 }
