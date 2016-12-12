@@ -229,6 +229,17 @@ public class Level {
 		return greyTriangles;
 	}
 	
+	public boolean hasWon() {
+		for (Triangle[] row : triangles) {
+			for (Triangle t : row) {
+				if (t != null && t.getColor() != TriangleColor.BLANK)
+					return false;
+			}
+		}
+		
+		return true;
+	}
+	
 	/**
 	 * @param rowIndex 0-indexed
 	 * @return the number of triangles on that row, in the range [1,NB_COLUMNS]

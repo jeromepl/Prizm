@@ -261,6 +261,17 @@ public class GameScreen implements Screen, InputProcessor {
 				    public void run() {
 				    	// After all collisions have been checked, remove Grey triangles
 						level.removeGreyTriangles();
+						
+						// Check if the player has won (cleared the board)
+						if (level.hasWon()) {
+							Timer.schedule(new Task() {
+								@Override
+								public void run() {
+									// TODO add points and number of moves here
+									game.setScreen(new WinScreen(game, skin, level.getLevelNumber(), 0, 0));
+								}
+							}, 0.5f);
+						}
 				    }
 				}, 0.5f);
 		    }
