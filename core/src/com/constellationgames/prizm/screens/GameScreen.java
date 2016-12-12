@@ -42,6 +42,10 @@ public class GameScreen implements Screen, InputProcessor {
 	private ColorSelectionPopup popup;
 	private TextButton backButton;
 	
+	// This variable is used to prevent users from moving triangles while the board is getting updated
+	// This prevents an exploit since the updating time is quite long due to the delay introduced to let players see what is happening when triangles are cleared
+	private boolean updatingLevel = false;
+	
 	private Viewport viewport;
 	private ShapeRenderer shapeRenderer;
 	private SpriteBatch spriteBatch;
@@ -163,7 +167,7 @@ public class GameScreen implements Screen, InputProcessor {
 		screenX = (int) coords.x;
 		screenY = (int) coords.y;
 		
-		if (!popup.isVisible()) {
+		if (!popup.isVisible() && !updatingLevel) {
 			Triangle[][] triangles = level.getTriangles();
 			
 			for (Triangle[] row : triangles) {
@@ -250,6 +254,8 @@ public class GameScreen implements Screen, InputProcessor {
 	}
 	
 	public void updateLevel(final Triangle... updatedTriangles) {
+		updatingLevel = true;
+		
 		Timer.schedule(new Task(){
 		    @Override
 		    public void run() {
@@ -273,6 +279,9 @@ public class GameScreen implements Screen, InputProcessor {
 								}
 							}, 0.5f);
 						}
+						
+						updatingLevel = false;
+						
 				    }
 				}, 0.5f);
 		    }
