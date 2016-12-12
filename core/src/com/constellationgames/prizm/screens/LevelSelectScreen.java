@@ -7,14 +7,12 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.constellationgames.prizm.Prizm;
 import com.constellationgames.prizm.utils.CustomTextButton;
 
@@ -61,9 +59,9 @@ public class LevelSelectScreen implements Screen {
 	public void show() {
 		Table table = new Table();
 		
-		int buttonsPerRow = ((int)(Prizm.STANDARD_WIDTH - 2 * STANDARD_BUTTON_MARGIN)) / (STANDARD_BUTTON_WIDTH + STANDARD_BUTTON_MARGIN);
+		int buttonsPerRow = ((int)(Prizm.STANDARD_WIDTH - 2 * STANDARD_BUTTON_MARGIN)) / (STANDARD_BUTTON_WIDTH + STANDARD_BUTTON_MARGIN); // Changing STANDARD_BUTTON_WIDTH to Gdx.graphics.getHeight() will make the row of levels fill the width of the screen
 		
-		backButton.setSize(STANDARD_BUTTON_WIDTH, STANDARD_BUTTON_HEIGHT * 3f/4); // Changing STANDARD_BUTTON_WIDTH to Gdx.graphics.getHeight() will make the row of levels fill the width of the screen
+		backButton.setSize(STANDARD_BUTTON_WIDTH, STANDARD_BUTTON_HEIGHT * 3f/4);
 		backButton.getStyle().font.getData().setScale(STANDARD_BUTTON_SCALE);
 		
 		screenTitle.setFontScale(STANDARD_TITLE_SCALE);

@@ -157,11 +157,11 @@ public class GameScreen implements Screen, InputProcessor {
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 		stage.touchDown(screenX, screenY, pointer, button);
 		
+		// Un-project the screen positions to get the in-game positions
 		Vector3 coords = viewport.getCamera().unproject(new Vector3(screenX, Gdx.graphics.getHeight() - screenY, 0),
 				viewport.getScreenX(), viewport.getScreenY(), viewport.getScreenWidth(), viewport.getScreenHeight());
-		screenX = (int)coords.x;
-		screenY = (int)coords.y;
-		//System.out.println(screenX + " : " + screenY);
+		screenX = (int) coords.x;
+		screenY = (int) coords.y;
 		
 		if (!popup.isVisible()) {
 			Triangle[][] triangles = level.getTriangles();
@@ -184,10 +184,11 @@ public class GameScreen implements Screen, InputProcessor {
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
 		stage.touchUp(screenX, screenY, pointer, button);
 		
+		// Un-project the screen positions to get the in-game positions
 		Vector3 coords = viewport.getCamera().unproject(new Vector3(screenX, Gdx.graphics.getHeight() - screenY, 0),
 				viewport.getScreenX(), viewport.getScreenY(), viewport.getScreenWidth(), viewport.getScreenHeight());
-		screenX = (int)coords.x;
-		screenY = (int)coords.y;
+		screenX = (int) coords.x;
+		screenY = (int) coords.y;
 		
 		if (selectedTriangle != null) {
 			Triangle[][] triangles = level.getTriangles();

@@ -3,7 +3,6 @@ package com.constellationgames.prizm;
 import java.util.ArrayList;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -20,8 +19,6 @@ public class Level {
 	private int levelNumber;
 	
 	private Triangle[][] triangles = new Triangle[NB_ROWS][NB_COLUMNS];
-	
-	private Color textColor = Color.BLACK;
 
 	public Level(GameScreen gameScreen, int levelNumber) {
 		this.gameScreen = gameScreen;
