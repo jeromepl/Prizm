@@ -147,7 +147,7 @@ public class GameScreen implements Screen, InputProcessor {
 		stage.keyUp(keycode);
 		// Handle back button press to go back to menu
 		if (keycode == Keys.BACK) {          
-			game.setScreen(new MenuScreen(game));
+			game.setScreen(new LevelSelectScreen(game, skin));
 		}
 		return true;
 	}
