@@ -17,6 +17,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -34,10 +35,13 @@ import com.constellationgames.prizm.utils.TriangleColor;
 public class GameScreen implements Screen, InputProcessor {
 	
 	// Screen values
-	public static final int MARGIN_TOP = 30; // In px, margin between the grid and the borders of the screen
+	public static final int MARGIN_TOP = 30; // In px, margin between the GRID and the borders of the screen
 	public static final int MARGIN_BOTTOM = 60;
 	private static final int BUTTON_MARGIN = 15;
-	private static final int BUTTON_Y_POSITION = 30;
+	private static final int BUTTON_PADDING = 10;
+	private static final int SECTION_MARGIN = 70; // Margin between the buttons and the labels in the footer
+	private static final int LABELS_SECTION_OFFSET = 30; // The labels need to be a bit more centered than the buttons in the footer
+	private static final int FOOTER_Y_POSITION = 30;
 	
 	private Level level;
 	private Game game;
@@ -45,9 +49,8 @@ public class GameScreen implements Screen, InputProcessor {
 	private Stage stage;
 	private Skin skin;
 	private ColorSelectionPopup popup;
-	private TextButton backButton;
-	private TextButton undoButton;
-	private TextButton resetButton;
+	private TextButton backButton, undoButton, resetButton;
+	private Label moveCountLabel, pointsLabel;
 	
 	// This variable is used to prevent users from moving triangles while the board is getting updated
 	// This prevents an exploit since the updating time is quite long due to the delay introduced to let players see what is happening when triangles are cleared
@@ -83,15 +86,33 @@ public class GameScreen implements Screen, InputProcessor {
 		
 		stage = new Stage(viewport);
 		
-		Table table = new Table();
+		Table footerTable = new Table();
+		Table labelTable = new Table();
+		Table buttonTable = new Table();
+		
+		moveCountLabel = new Label("0 Moves", skin);
+		pointsLabel = new Label("0 Points", skin);
+		moveCountLabel.setColor(Color.BLACK);
+		pointsLabel.setColor(Color.BLACK);
+		labelTable.add(moveCountLabel).space(BUTTON_MARGIN);
+		labelTable.add(pointsLabel).space(BUTTON_MARGIN);
+		
+		footerTable.add(labelTable).spaceRight(SECTION_MARGIN).padLeft(LABELS_SECTION_OFFSET).left();
+		
 		backButton = new TextButton("Back", skin);
 		undoButton = new TextButton("Undo", skin);
 		resetButton = new TextButton("Reset", skin);
-		table.add(backButton).space(BUTTON_MARGIN);
-		table.add(undoButton).space(BUTTON_MARGIN);
-		table.add(resetButton).space(BUTTON_MARGIN);
-		table.setX(Prizm.STANDARD_WIDTH / 2); // Center the table horizontally
-		table.setY(BUTTON_Y_POSITION);
+		backButton.padLeft(BUTTON_PADDING).padRight(BUTTON_PADDING);
+		undoButton.padLeft(BUTTON_PADDING).padRight(BUTTON_PADDING);
+		resetButton.padLeft(BUTTON_PADDING).padRight(BUTTON_PADDING);
+		buttonTable.add(backButton).space(BUTTON_MARGIN);
+		buttonTable.add(undoButton).space(BUTTON_MARGIN);
+		buttonTable.add(resetButton).space(BUTTON_MARGIN);
+		
+		footerTable.add(buttonTable).spaceLeft(SECTION_MARGIN).right();
+		
+		footerTable.setX(Prizm.STANDARD_WIDTH / 2); // Center the footerTable horizontally
+		footerTable.setY(FOOTER_Y_POSITION);
 		
 		popup = new ColorSelectionPopup(this, skin);
 		
@@ -122,7 +143,7 @@ public class GameScreen implements Screen, InputProcessor {
 			}
 		});
 		
-		stage.addActor(table);
+		stage.addActor(footerTable);
 		stage.addActor(popup);
 	}
 	
@@ -136,6 +157,10 @@ public class GameScreen implements Screen, InputProcessor {
 		
 		level.render(delta, shapeRenderer, spriteBatch, font, glyphLayout);
 		dragOverlay.render(delta, shapeRenderer);
+		
+		// Update the number of moves and points
+		moveCountLabel.setText(level.getMoveCount() + " moves");
+		pointsLabel.setText(level.getPoints() + " points");
 		
 		stage.act(delta);
         stage.draw();
@@ -317,7 +342,7 @@ public class GameScreen implements Screen, InputProcessor {
 									@Override
 									public void run() {
 										// TODO add points and number of moves here
-										game.setScreen(new WinScreen(game, skin, level.getLevelNumber(), 0, 0));
+										game.setScreen(new WinScreen(game, skin, level.getLevelNumber(), level.getMoveCount(), level.getPoints()));
 									}
 								}, 0.5f);
 							}

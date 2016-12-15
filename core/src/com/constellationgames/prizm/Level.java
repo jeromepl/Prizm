@@ -20,6 +20,9 @@ public class Level {
 	private GameScreen gameScreen;
 	private int levelNumber;
 	
+	private int moveCount = -1; // Start the move count at -1 since it will be incremented to 1 at the first applyChanges() in the constructor
+	private int points = 0; //TODO
+	
 	private Triangle[][] triangles = new Triangle[NB_ROWS][NB_COLUMNS];
 	
 	private Stack<Triangle[][]> states = new Stack<Triangle[][]>();
@@ -253,6 +256,7 @@ public class Level {
 	 */
 	public void applyChanges() {
 		states.push(trianglesCopy(triangles));
+		moveCount++;
 	}
 	
 	/**
@@ -262,6 +266,7 @@ public class Level {
 		if (states.size() > 1) {
 			states.pop();
 			triangles = trianglesCopy(states.peek());
+			moveCount--;
 		}
 	}
 	
@@ -299,6 +304,14 @@ public class Level {
 	
 	public int getLevelNumber() {
 		return levelNumber;
+	}
+	
+	public int getMoveCount() {
+		return moveCount;
+	}
+	
+	public int getPoints() {
+		return points;
 	}
 	
 	public Triangle[][] getTriangles() {
