@@ -92,10 +92,12 @@ public class Level {
 	/**
 	 * check for color canceling around a given triangle
 	 * @param t
+	 * @return the number of collisions found
 	 */
-	public void checkCollisions(Triangle t) {
+	public int checkCollisions(Triangle t) {
 		TriangleColor color = t.getColor();
 		ArrayList<Triangle> neighbors = new ArrayList<Triangle>();
+		int nbCollisions = 0;
 		
 		if (t.isOvert()) // Check triangle below
 			neighbors.add(triangles[t.getRow() + 1][t.getColumn()]);
@@ -113,9 +115,11 @@ public class Level {
 			if (toCheck != null && toCheck.getColor().getValue() + color.getValue() == TriangleColor.COMPLEMENTARY.getValue()) {
 				toCheck.setColor(TriangleColor.GREY);
 				t.setColor(TriangleColor.GREY);
+				nbCollisions++;
 			}
 		}
 		
+		return nbCollisions;	
 	}
 	
 	/**

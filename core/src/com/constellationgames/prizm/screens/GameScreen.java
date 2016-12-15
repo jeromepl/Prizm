@@ -261,34 +261,45 @@ public class GameScreen implements Screen, InputProcessor {
 	public void updateLevel(final Triangle... updatedTriangles) {
 		updatingLevel = true;
 		
+		// TODO The best thing to have here would be to pre-compute the state of the board,
+		// then let the animations happen later. This would mean there would be no "updatingLevel"
+		// variable and the user would be able to move triangles as fast as he wants.
+		// Currently, the move will not initiate if one of the tasks below is in progress.
+		
 		Timer.schedule(new Task(){
 		    @Override
 		    public void run() {
 		    	// Check if some colors cancel out
+		    	int changes = 0;
 		    	for (Triangle t: updatedTriangles)
-		    		level.checkCollisions(t);
+		    		changes += level.checkCollisions(t);
 		    	
-				Timer.schedule(new Task(){
-				    @Override
-				    public void run() {
-				    	// After all collisions have been checked, remove Grey triangles
-						level.removeGreyTriangles();
-						
-						// Check if the player has won (cleared the board)
-						if (level.hasWon()) {
-							Timer.schedule(new Task() {
-								@Override
-								public void run() {
-									// TODO add points and number of moves here
-									game.setScreen(new WinScreen(game, skin, level.getLevelNumber(), 0, 0));
-								}
-							}, 0.5f);
-						}
-						
-						updatingLevel = false;
-						
-				    }
-				}, 0.5f);
+		    	if (changes > 0) {
+		    		Timer.schedule(new Task(){
+					    @Override
+					    public void run() {
+					    	// After all collisions have been checked, remove Grey triangles
+							level.removeGreyTriangles();
+							
+							// Check if the player has won (cleared the board)
+							if (level.hasWon()) {
+								Timer.schedule(new Task() {
+									@Override
+									public void run() {
+										// TODO add points and number of moves here
+										game.setScreen(new WinScreen(game, skin, level.getLevelNumber(), 0, 0));
+									}
+								}, 0.5f);
+							}
+							
+							updatingLevel = false;
+							
+					    }
+					}, 0.5f);
+		    	}
+		    	else {
+		    		updatingLevel = false;
+		    	}
 		    }
 		}, 0.5f);
 	}
