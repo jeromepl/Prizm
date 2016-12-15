@@ -39,15 +39,13 @@ public class Triangle {
 		// Render the interior
 		shapeRenderer.begin(ShapeType.Filled);
 		shapeRenderer.setColor(color.getColor());
-		shapeRenderer.triangle(pos[0][0], pos[0][1], pos[1][0], pos[1][1], pos[2][0], pos[2][1]);
-		
+		shapeRenderer.triangle(pos[0][0], pos[0][1], pos[1][0], pos[1][1], pos[2][0], pos[2][1]);	
 		shapeRenderer.end();
 		
 		// Render the border
 		shapeRenderer.begin(ShapeType.Line);
 		shapeRenderer.setColor(Color.BLACK);
-		shapeRenderer.triangle(pos[0][0], pos[0][1], pos[1][0], pos[1][1], pos[2][0], pos[2][1]);
-		
+		shapeRenderer.triangle(pos[0][0], pos[0][1], pos[1][0], pos[1][1], pos[2][0], pos[2][1]);	
 		shapeRenderer.end();
 	}
 	
