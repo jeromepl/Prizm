@@ -30,12 +30,12 @@ public class WinScreen implements Screen {
 	private TextButton selectLevel;
 	private TextButton mainMenu;
 	private Label screenTitle;
-	private Label nbMovesLabel;
+	private Label moveCountLabel;
 	private Label pointsLabel;
 	
 	public WinScreen(final Game game, final Skin skin, final int level, int nbMoves, int points) {
 		screenTitle = new Label("You Won!", skin);
-		nbMovesLabel = new Label(points + " points", skin);
+		moveCountLabel = new Label(points + " points", skin);
 		pointsLabel = new Label(nbMoves + " moves", skin);
 		
 		// TODO check if level is not == final level (in which case disable the button?)
@@ -75,7 +75,7 @@ public class WinScreen implements Screen {
 		
 		screenTitle.setFontScale(STANDARD_TITLE_SCALE);
 		table.add(screenTitle).center().spaceBottom(STANDARD_TITLE_MARGIN).row();
-		table.add(nbMovesLabel).center().row();
+		table.add(moveCountLabel).center().row();
 		table.add(pointsLabel).center().row();
 
 		table.add(nextLevel).center().space(4 * STANDARD_BUTTON_MARGIN).size(nextLevel.getWidth(), nextLevel.getHeight()).row();
