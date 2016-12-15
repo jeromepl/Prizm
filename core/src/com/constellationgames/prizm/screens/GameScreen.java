@@ -39,8 +39,6 @@ public class GameScreen implements Screen, InputProcessor {
 	public static final int MARGIN_BOTTOM = 60;
 	private static final int BUTTON_MARGIN = 15;
 	private static final int BUTTON_PADDING = 10;
-	private static final int SECTION_MARGIN = 70; // Margin between the buttons and the labels in the footer
-	private static final int LABELS_SECTION_OFFSET = 30; // The labels need to be a bit more centered than the buttons in the footer
 	private static final int FOOTER_Y_POSITION = 30;
 	
 	private Level level;
@@ -86,7 +84,6 @@ public class GameScreen implements Screen, InputProcessor {
 		
 		stage = new Stage(viewport);
 		
-		Table footerTable = new Table();
 		Table labelTable = new Table();
 		Table buttonTable = new Table();
 		
@@ -97,7 +94,10 @@ public class GameScreen implements Screen, InputProcessor {
 		labelTable.add(moveCountLabel).space(BUTTON_MARGIN);
 		labelTable.add(pointsLabel).space(BUTTON_MARGIN);
 		
-		footerTable.add(labelTable).spaceRight(SECTION_MARGIN).padLeft(LABELS_SECTION_OFFSET).left();
+		// The label table is position in the bottom left corner and takes up 50% of the width of the screen
+		labelTable.setWidth(Prizm.STANDARD_WIDTH / 2);
+		labelTable.setX(0);
+		labelTable.setY(FOOTER_Y_POSITION);
 		
 		backButton = new TextButton("Back", skin);
 		undoButton = new TextButton("Undo", skin);
@@ -109,10 +109,10 @@ public class GameScreen implements Screen, InputProcessor {
 		buttonTable.add(undoButton).space(BUTTON_MARGIN);
 		buttonTable.add(resetButton).space(BUTTON_MARGIN);
 		
-		footerTable.add(buttonTable).spaceLeft(SECTION_MARGIN).right();
-		
-		footerTable.setX(Prizm.STANDARD_WIDTH / 2); // Center the footerTable horizontally
-		footerTable.setY(FOOTER_Y_POSITION);
+		// The button table is position in the bottom right corner and takes up 50% of the width of the screen
+		buttonTable.setWidth(Prizm.STANDARD_WIDTH / 2);
+		buttonTable.setX(Prizm.STANDARD_WIDTH / 2);
+		buttonTable.setY(FOOTER_Y_POSITION);
 		
 		popup = new ColorSelectionPopup(this, skin);
 		
@@ -143,7 +143,8 @@ public class GameScreen implements Screen, InputProcessor {
 			}
 		});
 		
-		stage.addActor(footerTable);
+		stage.addActor(labelTable);
+		stage.addActor(buttonTable);
 		stage.addActor(popup);
 	}
 	
