@@ -7,9 +7,10 @@ import com.constellationgames.prizm.screens.GameScreen;
 import com.constellationgames.prizm.utils.TriangleColor;
 
 public class Triangle {
-
-	private static final int WIDTH = (Prizm.STANDARD_WIDTH - GameScreen.MARGIN * 2) / 4;
-	private static final int HEIGHT = (int) Math.round(WIDTH / 2.0 * Math.sqrt(3)); // Formula to find height of equilateral triangle
+	
+	private static final int HEIGHT = (Prizm.STANDARD_HEIGHT - GameScreen.MARGIN_TOP - GameScreen.MARGIN_BOTTOM) / Level.NB_ROWS;
+	private static final int WIDTH = (int) Math.round(HEIGHT * 2.0 / Math.sqrt(3)); // Formula to find width of equilateral triangle
+	private static final int HORIZONTAL_MARGIN = (int) ((Prizm.STANDARD_WIDTH - WIDTH * Math.ceil(Level.NB_COLUMNS / 2.0)) / 2);
 	
 	private int row, column;
 	private TriangleColor color;
@@ -53,16 +54,16 @@ public class Triangle {
 	public float[][] getScreenPosition() {	
 		float[][] pos = new float[3][2]; // Triangle coordinates
 		if (isOvert()) {
-			pos[0][0] = GameScreen.MARGIN + WIDTH * column / 2;
-			pos[0][1] = GameScreen.MARGIN + HEIGHT * (row + 1);
+			pos[0][0] = HORIZONTAL_MARGIN + WIDTH * column / 2;
+			pos[0][1] = GameScreen.MARGIN_TOP + HEIGHT * (row + 1);
 			pos[1][0] = pos[0][0] + WIDTH;
 			pos[1][1] = pos[0][1];
 			pos[2][0] = (pos[0][0] + pos[1][0]) / 2;
 			pos[2][1] = pos[0][1] - HEIGHT;
 		}
 		else {
-			pos[0][0] = GameScreen.MARGIN + WIDTH * (column - 1) / 2 + WIDTH / 2;
-			pos[0][1] = GameScreen.MARGIN + HEIGHT * row;
+			pos[0][0] = HORIZONTAL_MARGIN + WIDTH * (column - 1) / 2 + WIDTH / 2;
+			pos[0][1] = GameScreen.MARGIN_TOP + HEIGHT * row;
 			pos[1][0] = pos[0][0] + WIDTH;
 			pos[1][1] = pos[0][1];
 			pos[2][0] = (pos[0][0] + pos[1][0]) / 2;

@@ -18,6 +18,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Timer;
@@ -33,7 +34,10 @@ import com.constellationgames.prizm.utils.TriangleColor;
 public class GameScreen implements Screen, InputProcessor {
 	
 	// Screen values
-	public static final int MARGIN = 30; // In px, margin between the grid and the borders of the screen
+	public static final int MARGIN_TOP = 30; // In px, margin between the grid and the borders of the screen
+	public static final int MARGIN_BOTTOM = 60;
+	private static final int BUTTON_MARGIN = 15;
+	private static final int BUTTON_Y_POSITION = 30;
 	
 	private Level level;
 	private Game game;
@@ -42,6 +46,8 @@ public class GameScreen implements Screen, InputProcessor {
 	private Skin skin;
 	private ColorSelectionPopup popup;
 	private TextButton backButton;
+	private TextButton undoButton;
+	private TextButton resetButton;
 	
 	// This variable is used to prevent users from moving triangles while the board is getting updated
 	// This prevents an exploit since the updating time is quite long due to the delay introduced to let players see what is happening when triangles are cleared
@@ -76,7 +82,17 @@ public class GameScreen implements Screen, InputProcessor {
 		spriteBatch = new SpriteBatch();
 		
 		stage = new Stage(viewport);
+		
+		Table table = new Table();
 		backButton = new TextButton("Back", skin);
+		undoButton = new TextButton("Undo", skin);
+		resetButton = new TextButton("Reset", skin);
+		table.add(backButton).space(BUTTON_MARGIN);
+		table.add(undoButton).space(BUTTON_MARGIN);
+		table.add(resetButton).space(BUTTON_MARGIN);
+		table.setX(Prizm.STANDARD_WIDTH / 2); // Center the table horizontally
+		table.setY(BUTTON_Y_POSITION);
+		
 		popup = new ColorSelectionPopup(this, skin);
 		
 		// Create the font
@@ -92,7 +108,21 @@ public class GameScreen implements Screen, InputProcessor {
 			}
 		});
 		
-		stage.addActor(backButton);
+		undoButton.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				level.undo();
+			}
+		});
+		
+		resetButton.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				game.setScreen(new GameScreen(game, skin, level.getLevelNumber()));
+			}
+		});
+		
+		stage.addActor(table);
 		stage.addActor(popup);
 	}
 	

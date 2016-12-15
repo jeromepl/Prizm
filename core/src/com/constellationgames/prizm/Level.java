@@ -88,6 +88,10 @@ public class Level {
 		}
 	}
 	
+	public void undo() {
+		// TODO
+	}
+	
 	
 	/**
 	 * check for color canceling around a given triangle
