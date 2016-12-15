@@ -50,7 +50,7 @@ public class Triangle {
 		shapeRenderer.end();
 	}
 	
-	private float[][] getScreenPosition() {	
+	public float[][] getScreenPosition() {	
 		float[][] pos = new float[3][2]; // Triangle coordinates
 		if (isOvert()) {
 			pos[0][0] = GameScreen.MARGIN + WIDTH * column / 2;

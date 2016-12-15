@@ -24,6 +24,7 @@ import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.constellationgames.prizm.DragOverlay;
 import com.constellationgames.prizm.Level;
 import com.constellationgames.prizm.Prizm;
 import com.constellationgames.prizm.Triangle;
@@ -54,6 +55,7 @@ public class GameScreen implements Screen, InputProcessor {
 	
 	// Variables for drag-and-dropping triangles
 	private Triangle selectedTriangle = null;
+	private DragOverlay dragOverlay = new DragOverlay();
 
 	public GameScreen(Game game, Skin skin, int levelNumber) {
 		this.game = game;
@@ -103,6 +105,7 @@ public class GameScreen implements Screen, InputProcessor {
 		spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
 		
 		level.render(delta, shapeRenderer, spriteBatch, font, glyphLayout);
+		dragOverlay.render(delta, shapeRenderer);
 		
 		stage.act(delta);
         stage.draw();
@@ -174,6 +177,7 @@ public class GameScreen implements Screen, InputProcessor {
 				for (Triangle t: row) {
 					if (t != null && t.getColor() != TriangleColor.BLANK && t.getColor() != TriangleColor.GREY && t.contains(screenX, screenY)) {
 						selectedTriangle = t;
+						dragOverlay.startDrag(selectedTriangle, screenX, screenY);
 						
 						return true;
 					}
@@ -247,6 +251,7 @@ public class GameScreen implements Screen, InputProcessor {
 				}
 			}
 			
+			dragOverlay.stopDrag();
 			selectedTriangle = null;
 		}
 		
@@ -290,7 +295,16 @@ public class GameScreen implements Screen, InputProcessor {
 
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
-		return stage.touchDragged(screenX, screenY, pointer);
+		stage.touchDragged(screenX, screenY, pointer);
+		
+		Vector3 coords = viewport.getCamera().unproject(new Vector3(screenX, Gdx.graphics.getHeight() - screenY, 0),
+				viewport.getScreenX(), viewport.getScreenY(), viewport.getScreenWidth(), viewport.getScreenHeight());
+		
+		if (selectedTriangle != null) {
+			dragOverlay.dragTo((int) coords.x, (int) coords.y);
+		}
+		
+		return true;
 	}
 
 	@Override
