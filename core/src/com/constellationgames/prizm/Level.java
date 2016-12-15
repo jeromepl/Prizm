@@ -1,6 +1,8 @@
 package com.constellationgames.prizm;
 
 import java.util.ArrayList;
+import java.util.Stack;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -19,6 +21,8 @@ public class Level {
 	private int levelNumber;
 	
 	private Triangle[][] triangles = new Triangle[NB_ROWS][NB_COLUMNS];
+	
+	private Stack<Triangle[][]> states = new Stack<Triangle[][]>();
 
 	public Level(GameScreen gameScreen, int levelNumber) {
 		this.gameScreen = gameScreen;
@@ -35,7 +39,9 @@ public class Level {
 			}
 		}
 		
+		// Set the initial state
 		loadLevel(levelNumber);
+		applyChanges();
 	}
 	
 	private void loadLevel(int levelNumber) {
@@ -86,10 +92,6 @@ public class Level {
 					t.render(delta, shapeRenderer);
 			}
 		}
-	}
-	
-	public void undo() {
-		// TODO
 	}
 	
 	
@@ -243,6 +245,43 @@ public class Level {
 		}
 		
 		return true;
+	}
+	
+	/**
+	 * Create a new State of the board.
+	 * This will thus create a point that players can go back to using the "Undo" command
+	 */
+	public void applyChanges() {
+		states.push(trianglesCopy(triangles));
+	}
+	
+	/**
+	 * Set the board back to the last state (the last applyChanges() call)
+	 */
+	public void undo() {
+		if (states.size() > 1) {
+			states.pop();
+			triangles = trianglesCopy(states.peek());
+		}
+	}
+	
+	/**
+	 * Create a copy of a 2D array (used to copy and save the board state)
+	 * @param a the array to copy
+	 * @return the copy of the array
+	 */
+	private static Triangle[][] trianglesCopy(Triangle[][] a) {
+		Triangle[][] copy = new Triangle[a.length][];
+		for(int i = 0; i < a.length; i++) {
+			Triangle[] rowCopy = new Triangle[a[i].length];
+			for (int j = 0; j < rowCopy.length; j++) {
+				if (a[i][j] != null)
+					rowCopy[j] = a[i][j].copy();
+			}
+			copy[i] = rowCopy;
+		}
+		
+		return copy;
 	}
 	
 	/**

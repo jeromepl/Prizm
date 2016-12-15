@@ -127,4 +127,8 @@ public class Triangle {
 		// Even columns indices are overts in the upper half of the board
 		return (row + column) % 2 != 0;
 	}
+	
+	public Triangle copy() {
+		return new Triangle(row, column, color);
+	}
 }

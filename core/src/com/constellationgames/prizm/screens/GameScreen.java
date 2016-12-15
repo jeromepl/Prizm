@@ -323,12 +323,14 @@ public class GameScreen implements Screen, InputProcessor {
 							}
 							
 							updatingLevel = false;
+							level.applyChanges();
 							
 					    }
 					}, 0.5f);
 		    	}
 		    	else {
 		    		updatingLevel = false;
+		    		level.applyChanges();
 		    	}
 		    }
 		}, 0.5f);
