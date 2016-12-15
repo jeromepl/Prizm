@@ -25,7 +25,7 @@ public class Level {
 	
 	private Triangle[][] triangles = new Triangle[NB_ROWS][NB_COLUMNS];
 	
-	private Stack<Triangle[][]> states = new Stack<Triangle[][]>();
+	private Stack<LevelState> states = new Stack<LevelState>();
 
 	public Level(GameScreen gameScreen, int levelNumber) {
 		this.gameScreen = gameScreen;
@@ -258,7 +258,7 @@ public class Level {
 	 * This will thus create a point that players can go back to using the "Undo" command
 	 */
 	public void applyChanges() {
-		states.push(trianglesCopy(triangles));
+		states.push(new LevelState(triangles, points));
 		moveCount++;
 	}
 	
@@ -268,28 +268,10 @@ public class Level {
 	public void undo() {
 		if (states.size() > 1) {
 			states.pop();
-			triangles = trianglesCopy(states.peek());
+			triangles = states.peek().getTrianglesCopy();
+			points = states.peek().getPoints();
 			moveCount--;
 		}
-	}
-	
-	/**
-	 * Create a copy of a 2D array (used to copy and save the board state)
-	 * @param a the array to copy
-	 * @return the copy of the array
-	 */
-	private static Triangle[][] trianglesCopy(Triangle[][] a) {
-		Triangle[][] copy = new Triangle[a.length][];
-		for(int i = 0; i < a.length; i++) {
-			Triangle[] rowCopy = new Triangle[a[i].length];
-			for (int j = 0; j < rowCopy.length; j++) {
-				if (a[i][j] != null)
-					rowCopy[j] = a[i][j].copy();
-			}
-			copy[i] = rowCopy;
-		}
-		
-		return copy;
 	}
 	
 	/**
