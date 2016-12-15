@@ -239,6 +239,9 @@ public class Level {
 		return greyTriangles;
 	}
 	
+	/**
+	 * @return whether the player has cleared the board and won
+	 */
 	public boolean hasWon() {
 		for (Triangle[] row : triangles) {
 			for (Triangle t : row) {
