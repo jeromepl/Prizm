@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.constellationgames.prizm.screens.GameScreen;
+import com.constellationgames.prizm.utils.LevelLoader;
 import com.constellationgames.prizm.utils.TriangleColor;
 
 public class Level {
@@ -51,7 +52,7 @@ public class Level {
 		
 		//TODO there is no error handling here. A small mistake in the .csv file and everything goes boom
 		
-		FileHandle levelFile = Gdx.files.internal("levels/" + levelNumber + ".csv");
+		FileHandle levelFile = LevelLoader.getLevelFile(levelNumber);
 		String content = levelFile.readString();
 		
 		String[] rows = content.split("\\r?\\n"); // Split on end-of-lines

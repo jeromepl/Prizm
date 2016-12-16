@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.constellationgames.prizm.Prizm;
 import com.constellationgames.prizm.utils.CustomTextButton;
+import com.constellationgames.prizm.utils.LevelLoader;
 
 public class WinScreen implements Screen {
 
@@ -33,17 +34,20 @@ public class WinScreen implements Screen {
 	private Label moveCountLabel;
 	private Label pointsLabel;
 	
-	public WinScreen(final Game game, final Skin skin, final int level, int nbMoves, int points) {
+	private boolean showNextLevel;
+	
+	public WinScreen(final Game game, final Skin skin, final int levelNumber, int nbMoves, int points) {
 		screenTitle = new Label("You Won!", skin);
 		moveCountLabel = new Label(points + " points", skin);
 		pointsLabel = new Label(nbMoves + " moves", skin);
 		
-		// TODO check if level is not == final level (in which case disable the button?)
+		this.showNextLevel = (levelNumber + 1 <= LevelLoader.getNumberOfLevels());
+
 		nextLevel = new CustomTextButton("Next Level", skin);
 		nextLevel.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				game.setScreen(new GameScreen(game, skin, level + 1));
+				game.setScreen(new GameScreen(game, skin, levelNumber + 1));
 			}
 		});
 		
@@ -78,7 +82,9 @@ public class WinScreen implements Screen {
 		table.add(moveCountLabel).center().row();
 		table.add(pointsLabel).center().row();
 
-		table.add(nextLevel).center().space(4 * STANDARD_BUTTON_MARGIN).size(nextLevel.getWidth(), nextLevel.getHeight()).row();
+		if (showNextLevel) {
+			table.add(nextLevel).center().space(4 * STANDARD_BUTTON_MARGIN).size(nextLevel.getWidth(), nextLevel.getHeight()).row();
+		}
 		table.add(selectLevel).center().space(4 * STANDARD_BUTTON_MARGIN).size(selectLevel.getWidth(), selectLevel.getHeight()).row();
 		table.add(mainMenu).center().space(4 * STANDARD_BUTTON_MARGIN).size(mainMenu.getWidth(), mainMenu.getHeight()).row();
 		
