@@ -132,7 +132,8 @@ public class GameScreen implements Screen, InputProcessor {
 		undoButton.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				level.undo();
+				if (!popup.isVisible() && !updatingLevel)
+					level.undo();
 			}
 		});
 		
