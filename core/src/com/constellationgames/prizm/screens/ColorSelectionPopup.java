@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.Texture;
+import com.constellationgames.prizm.Prizm;
 import com.constellationgames.prizm.Triangle;
 import com.constellationgames.prizm.utils.TriangleColor;
 
@@ -113,6 +114,23 @@ public class ColorSelectionPopup extends Table {
 		gameScreen.updateLevel(fromTriangle, toTriangle);
 	}
 	
+	private void positionPopup(int clickX, int clickY) {
+		int x = clickX - WIDTH / 2;
+		int y = clickY - HEIGHT / 2;
+		
+		// Prevent the popup from being displayed outside of the screen
+		if (x - WIDTH / 2 < 0)
+			x = 0;
+		else if (x + WIDTH > Prizm.STANDARD_WIDTH)
+			x = Prizm.STANDARD_WIDTH - WIDTH;
+		if (y - HEIGHT / 2 < 0)
+			y = 0;
+		else if (y + HEIGHT > Prizm.STANDARD_HEIGHT)
+			y = Prizm.STANDARD_HEIGHT - HEIGHT;
+		
+		setPosition(x, y);
+	}
+	
 	public void show(float x, float y, Triangle fromTriangle, Triangle toTriangle, TriangleColor unsplitColor) {
 		this.fromTriangle = fromTriangle;
 		this.toTriangle = toTriangle;
@@ -142,7 +160,7 @@ public class ColorSelectionPopup extends Table {
 			return;
 		}
 		
-		setPosition(x, y);
+		positionPopup((int) x, (int) y);
 		setVisible(true);
 	}
 	
