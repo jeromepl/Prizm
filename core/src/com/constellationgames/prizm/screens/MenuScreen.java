@@ -36,6 +36,8 @@ public class MenuScreen implements Screen {
 	
 	public MenuScreen(Game game) {
 		this.game = game;
+		
+		Gdx.input.setInputProcessor(stage);
 	}
 
 	@Override
@@ -52,8 +54,6 @@ public class MenuScreen implements Screen {
 		
 		table.setFillParent(true);
 		stage.addActor(table);
-		
-		Gdx.input.setInputProcessor(stage);
 		
 		play.addListener(new ClickListener() {
 			@Override
@@ -76,10 +76,6 @@ public class MenuScreen implements Screen {
         
         stage.act();
         stage.draw();
-	}
-	
-	public Game getGame() {
-		return game;
 	}
 
 	@Override
