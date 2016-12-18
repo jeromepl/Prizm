@@ -282,9 +282,47 @@ public class Level {
 		return Math.min(rowIndex + 1, NB_ROWS - rowIndex) * 2 - 1;
 	}
 	
-	// Free memory when exiting the game
-	public void dispose() {
+	/**
+	 * @return an array containing the number of triangles of each color and each orientation
+	 */
+	public int[][] getTriangleStats() {
+		int[][] count = new int[3][2];
 		
+		for (Triangle[] row : triangles) {
+			for (Triangle t : row) {
+				if (t != null) {			
+					int orientationIndex = t.isOvert() ? 0 : 1;
+					
+					switch(t.getColor()) {
+					case YELLOW:
+						count[0][orientationIndex]++;
+						break;
+					case BLUE:
+						count[1][orientationIndex]++;
+						break;
+					case RED:
+						count[2][orientationIndex]++;
+						break;
+					case GREEN:
+						count[0][orientationIndex]++;
+						count[1][orientationIndex]++;
+						break;
+					case PURPLE:
+						count[1][orientationIndex]++;
+						count[2][orientationIndex]++;
+						break;
+					case ORANGE:
+						count[0][orientationIndex]++;
+						count[2][orientationIndex]++;
+						break;
+					default:
+						continue;
+					}
+				}
+			}
+		}
+		
+		return count;
 	}
 	
 	public int getLevelNumber() {

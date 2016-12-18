@@ -46,8 +46,9 @@ public class GameScreen implements Screen, InputProcessor {
 	
 	private Stage stage;
 	private Skin skin;
-	private ColorSelectionPopup popup;
-	private TextButton backButton, undoButton, resetButton;
+	private ColorSelectionPopup selectionPopup;
+	private StatsPopup statsPopup;
+	private TextButton backButton, undoButton, resetButton, statsButton;
 	private Label moveCountLabel, pointsLabel;
 	
 	// This variable is used to prevent users from moving triangles while the board is getting updated
@@ -68,6 +69,9 @@ public class GameScreen implements Screen, InputProcessor {
 		this.game = game;
 		this.skin = skin;
 		level = new Level(this, levelNumber);
+		
+		selectionPopup = new ColorSelectionPopup(this, skin);
+		statsPopup = new StatsPopup(level, skin);
 		
 		Gdx.input.setInputProcessor(this);
 	}
@@ -114,8 +118,6 @@ public class GameScreen implements Screen, InputProcessor {
 		buttonTable.setX(Prizm.STANDARD_WIDTH / 2);
 		buttonTable.setY(FOOTER_Y_POSITION);
 		
-		popup = new ColorSelectionPopup(this, skin);
-		
 		// Create the font
 		font = new BitmapFont(Gdx.files.internal("fonts/yaheiUI.fnt"));
 		font.setColor(Color.BLACK);
@@ -132,7 +134,7 @@ public class GameScreen implements Screen, InputProcessor {
 		undoButton.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				if (!popup.isVisible() && !updatingLevel)
+				if (!selectionPopup.isVisible() && !updatingLevel && !statsPopup.isVisible())
 					level.undo();
 			}
 		});
@@ -144,9 +146,24 @@ public class GameScreen implements Screen, InputProcessor {
 			}
 		});
 		
+		statsButton = new TextButton(" ? ", skin);
+		statsButton.pad(BUTTON_PADDING);
+		statsButton.setPosition(Prizm.STANDARD_WIDTH - 90, Prizm.STANDARD_HEIGHT - 70);
+		statsButton.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				if (statsPopup.isVisible())
+					statsPopup.hide();
+				else
+					statsPopup.show();
+			}
+		});
+		
 		stage.addActor(labelTable);
 		stage.addActor(buttonTable);
-		stage.addActor(popup);
+		stage.addActor(statsButton);
+		stage.addActor(selectionPopup);
+		stage.addActor(statsPopup);
 	}
 	
 	@Override
@@ -226,7 +243,7 @@ public class GameScreen implements Screen, InputProcessor {
 		screenX = (int) coords.x;
 		screenY = (int) coords.y;
 		
-		if (!popup.isVisible() && !updatingLevel) {
+		if (!selectionPopup.isVisible() && !updatingLevel && !statsPopup.isVisible()) {
 			Triangle[][] triangles = level.getTriangles();
 			
 			for (Triangle[] row : triangles) {
@@ -274,7 +291,7 @@ public class GameScreen implements Screen, InputProcessor {
 							}
 							else {
 								// destinationModified is not set to true. The update will happen when the pop-up terminates
-								popup.show(screenX, Prizm.STANDARD_HEIGHT - screenY, selectedTriangle, t, colorFrom);
+								selectionPopup.show(screenX, Prizm.STANDARD_HEIGHT - screenY, selectedTriangle, t, colorFrom);
 							
 								break outerloop;
 							}
@@ -293,7 +310,7 @@ public class GameScreen implements Screen, InputProcessor {
 						else if (colorFrom.getValue() > TriangleColor.RED.getValue()
 								&& colorTo.getValue() <= TriangleColor.RED.getValue()) {
 							// destinationModified is not set to true. The update will happen when the pop-up terminates
-							popup.show(screenX, Prizm.STANDARD_HEIGHT - screenY, selectedTriangle, t, colorFrom);
+							selectionPopup.show(screenX, Prizm.STANDARD_HEIGHT - screenY, selectedTriangle, t, colorFrom);
 						
 							break outerloop;
 						}
