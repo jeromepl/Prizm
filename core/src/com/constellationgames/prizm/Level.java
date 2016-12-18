@@ -3,7 +3,6 @@ package com.constellationgames.prizm;
 import java.util.ArrayList;
 import java.util.Stack;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;

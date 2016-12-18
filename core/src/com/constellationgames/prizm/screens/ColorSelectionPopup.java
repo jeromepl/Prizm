@@ -42,10 +42,9 @@ public class ColorSelectionPopup extends Table {
 		
 		this.gameScreen = gameScreen;
 		
-		float fontScale = FONT_SCALE;
 		header = new Label("Split Color", skin);
 		header.setColor(Color.BLACK);
-		header.setFontScale(fontScale);
+		header.setFontScale(FONT_SCALE);
 		
 		// Generate buttons of all possible colors
 		redButton = createColorButton(TriangleColor.RED.getColor());
@@ -71,7 +70,7 @@ public class ColorSelectionPopup extends Table {
 		setHeight(HEIGHT);
 		
 		// Add a background with a border
-		NinePatch patch = new NinePatch(new Texture(Gdx.files.internal("images/colorSelectionBackground.png")), 1, 1, 1, 1);
+		NinePatch patch = new NinePatch(new Texture(Gdx.files.internal("images/popupBackground.png")), 1, 1, 1, 1);
 		NinePatchDrawable background = new NinePatchDrawable(patch);
 		setBackground(background);
 		
